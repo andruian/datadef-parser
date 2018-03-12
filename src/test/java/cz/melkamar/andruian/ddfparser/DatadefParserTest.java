@@ -1,3 +1,5 @@
+package cz.melkamar.andruian.ddfparser;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -9,5 +11,4 @@ public class DatadefParserTest {
 
         assertEquals("hello there", parser.parse());
     }
-
 }
