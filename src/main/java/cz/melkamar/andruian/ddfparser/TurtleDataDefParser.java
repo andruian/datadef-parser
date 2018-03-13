@@ -4,7 +4,6 @@ import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.*;
 import org.eclipse.rdf4j.model.*;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.util.RDFCollections;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
@@ -19,9 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.PropertyPermission;
 
 public class TurtleDataDefParser implements DataDefParser {
     private static final Logger L = LoggerFactory.getLogger(TurtleDataDefParser.class);
@@ -38,7 +35,7 @@ public class TurtleDataDefParser implements DataDefParser {
 
     @Override
     public DataDef parse(String text) throws RdfFormatException, DataDefFormatException, IOException {
-        L.debug("Parsing a string");
+        L.debug("Parsing a string DataDef");
         L.trace(text);
 
         Model model = modelFromString(text);
@@ -47,18 +44,16 @@ public class TurtleDataDefParser implements DataDefParser {
 
     @Override
     public DataDef parse(InputStream textStream) throws RdfFormatException, DataDefFormatException, IOException {
+        L.debug("Parsing a textStream DataDef");
         Model model = modelFromStream(textStream);
         return parse(model);
     }
 
+    // TODO test
     @Override
     public DataDef parse(Model model) throws RdfFormatException, DataDefFormatException, IOException {
-        ValueFactory vf = SimpleValueFactory.getInstance();
-        IRI DATADEF = URIs.ANDR.DataDef;
-        IRI type = URIs.RDF.type;
-
         // For each datadef, get associated elements
-        Model dataDefs = model.filter(null, type, DATADEF);
+        Model dataDefs = model.filter(null, URIs.RDF.type, URIs.ANDR.DataDef);
         L.debug("Found {} DataDef objects in given text", dataDefs.size());
         for (Statement st : dataDefs) {
             IRI dataDefIri = (IRI) st.getSubject();
@@ -93,6 +88,8 @@ public class TurtleDataDefParser implements DataDefParser {
         return Rio.parse(stream, "", RDFFormat.TURTLE);
     }
 
+    // TODO test
+
     /**
      * Given a {@link Model} and an IRI of an andr:SourceClassDef resource in this model, construct an instance of
      * {@link SourceClassDef} from this resource.
@@ -122,6 +119,7 @@ public class TurtleDataDefParser implements DataDefParser {
         throw new NotImplementedException();
     }
 
+    // TODO test
     SelectProperty parseSelectProperty(Value selectPropertyId, Model model) throws DataDefFormatException {
         L.debug("Parsing a selectProperty " + selectPropertyId);
         Value name = getSingleObject((Resource) selectPropertyId, URIs.SCHEMA.name, model);
@@ -130,6 +128,19 @@ public class TurtleDataDefParser implements DataDefParser {
         return new SelectProperty(name.toString(), propertyPath);
     }
 
+    /**
+     * Parse a <a href="https://www.w3.org/TR/shacl/#property-paths">SHACL property path</a>.
+     * The supported property paths are:
+     * <ul>
+     * <li>Predicate path (a single predicate)</li>
+     * <li>Sequence path (a RDF list of predicates)</li>
+     * </ul>
+     *
+     * @param propertyPathId A Resource in the given model that is a SHACL property path (a single property or a list).
+     * @param model          A RDF4J model.
+     * @return A {@link PropertyPath} constructed from the given SHACL path.
+     * @throws DataDefFormatException When the property path cannot be parsed. Possibly malformed or not supported.
+     */
     PropertyPath parsePropertyPath(Resource propertyPathId, Model model) throws DataDefFormatException {
         L.debug("Parsing a propertyPath " + propertyPathId);
         if (model.filter(propertyPathId, URIs.RDF.first, null).isEmpty()) {
@@ -154,7 +165,7 @@ public class TurtleDataDefParser implements DataDefParser {
         }
     }
 
-
+    // TODO test
     LocationClassDef parseLocationClassDef(IRI locationClassDefIri, Model model) {
         throw new NotImplementedException();
     }
