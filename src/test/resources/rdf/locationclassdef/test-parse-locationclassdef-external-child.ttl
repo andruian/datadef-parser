@@ -9,9 +9,22 @@
 # Used to test including of remote RDF files. The part this will be included in is test-parse-locationclassdef-external-parent.ttl
 #
 
+:locClassPathsSource
+    a andr:LocationClassPathsSource;
+    andr:classToLocPath :adresniMistoClassToLocPath;
+    andr:classToLocPath :adresniMistoClassToLocPathB;
+    .
+
 :adresniMistoClassToLocPath
     a          andr:ClassToLocPath;
     andr:class <http://classB>;
     andr:lat   ( <http://A> <http://B> );
     andr:long  ( <http://X> <http://Y> );
+    .
+
+:adresniMistoClassToLocPathB
+    a          andr:ClassToLocPath;
+    andr:class <http://classC>;
+    andr:lat   ( <http://A> );
+    andr:long  ( <http://X> );
     .
