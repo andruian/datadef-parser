@@ -1,4 +1,9 @@
 package cz.melkamar.andruian.ddfparser;
 
-public interface DatadefParser {
+import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
+import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
+import cz.melkamar.andruian.ddfparser.model.DataDef;
+
+public interface DataDefParser {
+    DataDef parse(String text) throws RdfFormatException, DataDefFormatException;
 }

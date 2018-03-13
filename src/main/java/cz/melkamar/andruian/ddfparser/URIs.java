@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.rdf;
+package cz.melkamar.andruian.ddfparser;
 
 public class URIs {
     public static class Prefix {
