@@ -90,27 +90,33 @@ public class TurtleDataDefParser implements DataDefParser {
         return Rio.parse(stream, "", RDFFormat.TURTLE);
     }
 
-    // TODO test
 
     /**
-     * Given a {@link Model} and an IRI of an andr:SourceClassDef resource in this model, construct an instance of
-     * {@link SourceClassDef} from this resource.
+     * Construct an instance of {@link SourceClassDef} from the given {@link Resource} in a {@link Model}.
      *
-     * @param sourceClassDefIri An IRI of an andr:SourceClassDef resource.
-     * @param model             A RDF4J model.
+     * @param sourceClassDefResource An andr:SourceClassDef {@link Resource}.
+     * @param model                  A RDF4J model.
      * @return A {@link SourceClassDef} constructed from the model with the given IRI.
      */
-    public SourceClassDef parseSourceClassDef(IRI sourceClassDefIri, Model model) throws DataDefFormatException {
-        L.debug("Parsing a SourceClassDef {}", sourceClassDefIri.toString());
+    public SourceClassDef parseSourceClassDef(Resource sourceClassDefResource, Model model)
+            throws DataDefFormatException {
+        L.debug("Parsing a SourceClassDef {}", sourceClassDefResource.toString());
 
-        IRI sparqlEndpoint = getSingleObjectAsIri(sourceClassDefIri, URIs.ANDR.sparqlEndpoint, model);
+        IRI sparqlEndpoint = getSingleObjectAsIri(sourceClassDefResource, URIs.ANDR.sparqlEndpoint, model);
         L.debug("Found sparqlEndpoint " + sparqlEndpoint);
 
-        IRI clazz = getSingleObjectAsIri(sourceClassDefIri, URIs.ANDR._class, model);
+        IRI clazz = getSingleObjectAsIri(sourceClassDefResource, URIs.ANDR._class, model);
         L.debug("Found class " + clazz);
 
+        Resource pathToLocClassResource = getSingleObjectAsResource(sourceClassDefResource,
+                                                                    URIs.ANDR.pathToLocationClass,
+                                                                    model);
+        L.debug("Found pathToLocationClass " + pathToLocClassResource);
+        PropertyPath pathToLocationClass = parsePropertyPath(pathToLocClassResource, model);
+
+        // Parse andr:selectProperty linking to andr:SelectPropertyDef
         Set<Resource> selectPropsResources = Models.getPropertyResources(model,
-                                                                         sourceClassDefIri,
+                                                                         sourceClassDefResource,
                                                                          URIs.ANDR.selectProperty);
         L.debug("Found {} selectProperties", selectPropsResources.size());
         SelectProperty[] selectProperties = new SelectProperty[selectPropsResources.size()];
@@ -119,7 +125,7 @@ public class TurtleDataDefParser implements DataDefParser {
             selectProperties[i++] = parseSelectProperty(selectPropResource, model);
         }
 
-        throw new NotImplementedException();
+        return new SourceClassDef(sparqlEndpoint.toString(), clazz.toString(), pathToLocationClass, selectProperties);
     }
 
     /**
@@ -185,6 +191,15 @@ public class TurtleDataDefParser implements DataDefParser {
         throw new NotImplementedException();
     }
 
+    /**
+     * Read a {@link Value} linked to the given subject via a property. Assert that one and only one such value exists.
+     *
+     * @param subject     A {@link Resource} from which to read.
+     * @param propertyIri A {@link IRI} of a property to read from the subject.
+     * @param model       A RDF4J model.
+     * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
+     * @throws DataDefFormatException If none or more than one such value exists.
+     */
     Value getSingleObject(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
         Model objects = model.filter(subject, propertyIri, null);
         if (objects.size() != 1)
@@ -194,12 +209,30 @@ public class TurtleDataDefParser implements DataDefParser {
         return objects.iterator().next().getObject();
     }
 
+    /**
+     * Read an {@link IRI} linked to the given subject via a property. Assert that one and only one such IRI exists.
+     *
+     * @param subject     A {@link Resource} from which to read.
+     * @param propertyIri A {@link IRI} of a property to read from the subject.
+     * @param model       A RDF4J model.
+     * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
+     * @throws DataDefFormatException If none or more than one such IRI exists or if the linked value cannot be cast to an IRI.
+     */
     protected IRI getSingleObjectAsIri(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
         Value val = getSingleObject(subject, propertyIri, model);
         if (val instanceof IRI) return (IRI) val;
         else throw new DataDefFormatException("Could not cast object " + val + " to an IRI.");
     }
 
+    /**
+     * Read a {@link Resource} linked to the given subject via a property. Assert that one and only one such Resource exists.
+     *
+     * @param subject     A {@link Resource} from which to read.
+     * @param propertyIri A {@link IRI} of a property to read from the subject.
+     * @param model       A RDF4J model.
+     * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
+     * @throws DataDefFormatException If none or more than one such Resource exists or if the linked value cannot be cast to a Resource.
+     */
     Resource getSingleObjectAsResource(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
         Value val = getSingleObject(subject, propertyIri, model);
         if (val instanceof Resource) return (Resource) val;

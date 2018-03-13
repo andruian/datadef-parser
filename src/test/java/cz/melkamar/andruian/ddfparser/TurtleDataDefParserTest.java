@@ -3,6 +3,7 @@ package cz.melkamar.andruian.ddfparser;
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.model.PropertyPath;
 import cz.melkamar.andruian.ddfparser.model.SelectProperty;
+import cz.melkamar.andruian.ddfparser.model.SourceClassDef;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.junit.Test;
@@ -54,6 +55,52 @@ public class TurtleDataDefParserTest {
 
         assertTrue(blankNodeChecked);
         assertTrue(linkChecked);
+    }
+
+    /**
+     * Test {@link TurtleDataDefParser#parseSourceClassDef(IRI, Model)}.
+     */
+    @Test
+    public void parseSourceClassDef() throws IOException, DataDefFormatException {
+        TurtleDataDefParser dataDefParser = new TurtleDataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/sourceclassdef/test-parse-sourceclassdef.ttl",
+                                                          this.getClass());
+        Model model = dataDefParser.modelFromStream(is);
+
+        SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(vf.createIRI("http://sourceClassDef"), model);
+        assertEquals("http://localhost:3030/test/query", sourceClassDef.getSparqlEndpoint());
+        assertEquals("http://AClass", sourceClassDef.getClassUri());
+
+        assertArrayEquals(new String[]{"http://A", "http://B", "http://C", "http://D"},
+                          sourceClassDef.getPathToLocationClass().getPathElements());
+
+        assertEquals(1, sourceClassDef.getSelectProperties().length);
+        assertEquals("foobarblank", sourceClassDef.getSelectProperties()[0].getName());
+        assertArrayEquals(new String[]{"http://firstblank", "http://secondblank"},
+                          sourceClassDef.getSelectProperties()[0].getPath().getPathElements());
+
+//        assertEquals(2, props.size());
+//        for (Statement prop : props) {
+//            Resource obj = (Resource) prop.getObject();
+//            SelectProperty selectProperty = dataDefParser.parseSelectProperty(obj, model);
+//
+//            if (obj instanceof IRI) {
+//                linkChecked = true;
+//                assertEquals("foobarlinked", selectProperty.getName());
+//                assertEquals(2, selectProperty.getPath().getPathElements().length);
+//                assertEquals("http://firstlinked", selectProperty.getPath().getPathElements()[0]);
+//                assertEquals("http://secondlinked", selectProperty.getPath().getPathElements()[1]);
+//            } else if (!(obj instanceof Literal)) {
+//                blankNodeChecked = true; // A value is a blank node if not IRI nor Literal
+//                assertEquals("foobarblank", selectProperty.getName());
+//                assertEquals(2, selectProperty.getPath().getPathElements().length);
+//                assertEquals("http://firstblank", selectProperty.getPath().getPathElements()[0]);
+//                assertEquals("http://secondblank", selectProperty.getPath().getPathElements()[1]);
+//            }
+//        }
+//
+//        assertTrue(blankNodeChecked);
+//        assertTrue(linkChecked);
     }
 
 

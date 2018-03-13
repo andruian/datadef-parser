@@ -1,0 +1,21 @@
+@prefix andr: <http://purl.org/net/andruian/datadef#> .
+@prefix ruian: <http://ruian.linked.opendata.cz/ontology/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix s: <http://schema.org/> .
+@prefix ex: <http://example.org/> .
+@prefix : <http://foo/> .
+
+#<http://anObject>
+#    andr:sourceClassDef <http://sourceClassDef>;
+#    .
+#
+<http://sourceClassDef>
+    a                        andr:SourceClassDef;
+    andr:sparqlEndpoint      <http://localhost:3030/test/query>;
+    andr:class               <http://AClass>;
+    andr:pathToLocationClass ( <http://A> <http://B> <http://C> <http://D> );
+    andr:selectProperty [ a andr:SelectPropertyDef;
+                          s:name "foobarblank";
+                          andr:propertyPath (<http://firstblank> <http://secondblank>)
+                        ];
+    .
