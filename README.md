@@ -1,5 +1,7 @@
 # Andruian Data Definition parser
 
+[![Build Status](https://travis-ci.org/andruian/datadef-parser.svg?branch=master)](https://travis-ci.org/andruian/datadef-parser)
+
 ## Using on Android
 
 By default, Android does not provide a `javax.xml.datatype.DatatypeFactory` so attempting to use
