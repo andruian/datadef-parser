@@ -76,9 +76,9 @@ public class TurtleDataDefParserTest {
         String text = Util.readStringFromResource("rdf/test-parse-datadef.ttl", this.getClass());
         DataDef dataDef = dataDefParser.parse(text);
 
-        assertEquals("http://ruian.linked.opendata.cz/sparql", dataDef.getLocationDef().getSparqlEndpoint());
-        assertEquals(URIs.Prefix.ruian + "AdresniMisto", dataDef.getLocationDef().getClassUri());
-        assertEquals(1, dataDef.getLocationDef().getPathsToGps().size());
+        assertEquals("http://ruian.linked.opendata.cz/sparql", dataDef.getLocationClassDef().getSparqlEndpoint());
+        assertEquals(URIs.Prefix.ruian + "AdresniMisto", dataDef.getLocationClassDef().getClassUri());
+        assertEquals(1, dataDef.getLocationClassDef().getPathsToGps().size());
     }
 
     /**
@@ -90,7 +90,7 @@ public class TurtleDataDefParserTest {
         String text = Util.readStringFromResource("rdf/test-parse-datadef.ttl", this.getClass());
         DataDef dataDef = dataDefParser.parse(text);
 
-        ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        ClassToLocPath paths = dataDef.getLocationClassDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
         assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
         assertEquals(URIs.Prefix.s + "geo", paths.getLatCoord().getPathElements()[1]);
         assertEquals(URIs.Prefix.s + "latitude", paths.getLatCoord().getPathElements()[2]);
@@ -110,7 +110,7 @@ public class TurtleDataDefParserTest {
         String text = Util.readStringFromResource("rdf/test-parse-datadef-locationClassPathsSource.ttl", this.getClass());
         DataDef dataDef = dataDefParser.parse(text);
 
-        ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        ClassToLocPath paths = dataDef.getLocationClassDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
         assertNotNull(paths);
 
         assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
@@ -141,7 +141,7 @@ public class TurtleDataDefParserTest {
 //        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
 //        DataDef dataDef = dataDefParser.parse();
 //
-//        ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+//        ClassToLocPath paths = dataDef.getLocationClassDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
 //        assertNotNull(paths);
 //
 //        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);

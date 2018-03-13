@@ -2,14 +2,14 @@ package cz.melkamar.andruian.ddfparser.model;
 
 public class DataDef {
     private final String uri;
-    private final LocationDef locationDef;
+    private final LocationClassDef locationClassDef;
     private final SourceClassDef sourceClassDef;
 
     public DataDef(String uri,
-                   LocationDef locationDef,
+                   LocationClassDef locationClassDef,
                    SourceClassDef sourceClassDef) {
         this.uri = uri;
-        this.locationDef = locationDef;
+        this.locationClassDef = locationClassDef;
         this.sourceClassDef = sourceClassDef;
     }
 
@@ -17,8 +17,8 @@ public class DataDef {
         return uri;
     }
 
-    public LocationDef getLocationDef() {
-        return locationDef;
+    public LocationClassDef getLocationClassDef() {
+        return locationClassDef;
     }
 
     public SourceClassDef getSourceClassDef() {
@@ -29,7 +29,7 @@ public class DataDef {
     public String toString() {
         return "DataDef{" +
                 "uri='" + uri + '\'' +
-                ", locationDef=" + locationDef +
+                ", locationClassDef=" + locationClassDef +
                 ", sourceClassDef=" + sourceClassDef +
                 '}';
     }

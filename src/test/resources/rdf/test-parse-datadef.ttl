@@ -1,0 +1,73 @@
+@prefix andr: <http://purl.org/net/andruian/datadef#> .
+@prefix ruian: <http://ruian.linked.opendata.cz/ontology/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix s: <http://schema.org/> .
+@prefix ex: <http://example.org/> .
+@prefix : <http://foo/> .
+
+:dataDef
+    a                 andr:DataDef;
+    andr:locationClassDef  :locationClassDef;
+    andr:sourceClassDef :sourceClassDef;
+    .
+
+#
+# DATA DEFINITION
+#
+:sourceClassDef
+    a                        andr:SourceClassDef;
+    andr:sparqlEndpoint      <http://localhost:3030/test/query>;
+    andr:class               ex:MyObject;
+    andr:pathToLocationClass [ a sp:SeqPath;
+                               sp:path1 ex:linksTo;
+                               sp:path2 [ a sp:SeqPath;
+                                sp:path1 ex:linksTo2;
+                                sp:path2 ex:linksTo3;
+                               ]
+                               # možná chybí path2? jde to takhle?
+                             ];
+    andr:selectProperty [ a andr:SelectProperty;
+                          s:name "foobar";
+                          sp:path [ a        sp:SeqPath;
+                                    sp:path1 ex:id
+                                  ];
+                        ];
+    andr:selectProperty [ a andr:SelectProperty;
+                          s:name "another";
+                          sp:path [ a        sp:SeqPath;
+                                    sp:path1 ex:abc;
+                                    sp:path2 ex:def;
+                                  ];
+                        ];
+    .
+
+
+#
+# LOCATION DEFINITON
+#
+:locationClassDef
+    a                   andr:LocationDef;
+    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
+    andr:class          ruian:AdresniMisto;
+    andr:classToLocPath :adresniMistoClassToLocPath;
+    .
+
+# Description of how to get from object ruian:AdresniMisto to its lat/long coordinates
+:adresniMistoClassToLocPath
+    a          andr:ClassToLocPath;
+    andr:class ruian:AdresniMisto;
+    andr:lat   [ a sp:SeqPath;
+                 sp:path1 ruian:adresniBod;
+                 sp:path2 [
+                     sp:path1 s:geo;
+                     sp:path2 s:latitude;
+                 ]
+               ];
+    andr:long  [ # Do not fill in type - app should handle this case
+                 sp:path1 ruian:adresniBod;
+                 sp:path2 [
+                     sp:path1 s:geo;
+                     sp:path2 s:longitude;
+                 ]
+               ];
+    .

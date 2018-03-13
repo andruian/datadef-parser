@@ -3,11 +3,92 @@ package cz.melkamar.andruian.ddfparser;
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
+import cz.melkamar.andruian.ddfparser.model.LocationClassDef;
+import cz.melkamar.andruian.ddfparser.model.SourceClassDef;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class TurtleDataDefParser implements DataDefParser {
+    private static final Logger L = LoggerFactory.getLogger(TurtleDataDefParser.class);
+
+    public static void main(String[] args) throws IOException, DataDefFormatException, RdfFormatException {
+        TurtleDataDefParser parser = new TurtleDataDefParser();
+//        String text = Util.readStringFromResource("rdf/test-parse-datadef.ttl", TurtleDataDefParser.class);
+        byte[] encoded = Files.readAllBytes(Paths.get(
+                "d:\\cvut-checkouted\\_andruian\\ddfparser\\src\\test\\resources\\rdf\\test-parse-datadef.ttl"));
+        String text = new String(encoded, "utf-8");
+        parser.parse(text);
+    }
+
     @Override
-    public DataDef parse(String text) throws RdfFormatException, DataDefFormatException {
+    public DataDef parse(String text) throws RdfFormatException, DataDefFormatException, IOException {
+        L.debug("Parsing a string");
+        L.trace(text);
+        InputStream stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        Model model = Rio.parse(stream, "", RDFFormat.TURTLE);
+
+
+        ValueFactory vf = SimpleValueFactory.getInstance();
+        IRI DATADEF = URIs.ANDR.DataDef;
+        IRI type = URIs.RDF.type;
+
+        // For each datadef, get associated elements
+        Model dataDefs = model.filter(null, type, DATADEF);
+        L.debug("Found {} DataDef objects in given text", dataDefs.size());
+        for (Statement st : dataDefs) {
+            IRI dataDefIri = (IRI) st.getSubject();
+            L.debug("Parsing DataDef {}", dataDefIri.toString());
+
+            Model srcClassDefs = model.filter(dataDefIri, URIs.ANDR.sourceClassDef, null);
+            if (srcClassDefs.size() != 1)
+                throw new DataDefFormatException("A DataDef must have one linked andr:sourceClassDef property.");
+            IRI sourceClassDefIri = (IRI) srcClassDefs.objects().iterator().next();
+            SourceClassDef sourceClassDef = parseSourceClassDef(sourceClassDefIri, model);
+
+            Model locClassDefs = model.filter(dataDefIri, URIs.ANDR.locationDef, null);
+            if (locClassDefs.size() != 1)
+                throw new DataDefFormatException("A DataDef must have one linked andr:locationClassDef property.");
+            IRI locationClassDefIri = (IRI) locClassDefs.objects().iterator().next();
+            LocationClassDef locationClassDef = parseLocationClassDef(locationClassDefIri, model);
+
+            DataDef dataDef = new DataDef(dataDefIri.toString(), locationClassDef, sourceClassDef);
+            return dataDef; // TODO allow multiple datadefs
+        }
+
+
         return null;
+    }
+
+    /**
+     * Given a {@link Model} and an IRI of an andr:SourceClassDef resource in this model, construct an instance of
+     * {@link SourceClassDef} from this resource.
+     *
+     * @param sourceClassDefIri An IRI of an andr:SourceClassDef resource.
+     * @param model             A RDF4J model.
+     * @return A {@link SourceClassDef} constructed from the model with the given IRI.
+     */
+    public SourceClassDef parseSourceClassDef(IRI sourceClassDefIri, Model model) {
+        L.debug("Parsing a SourceClassDef {}", sourceClassDefIri.toString());
+        throw new NotImplementedException();
+    }
+
+    public LocationClassDef parseLocationClassDef(IRI locationClassDefIri, Model model) {
+        throw new NotImplementedException();
     }
 
 
@@ -104,7 +185,7 @@ public class TurtleDataDefParser implements DataDefParser {
 //                "# LOCATION DEFINITON\n" +
 //                "#\n" +
 //                ":locationDef\n" +
-//                "    a                   andr:LocationDef;\n" +
+//                "    a                   andr:LocationClassDef;\n" +
 //                "    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;\n" +
 //                "    andr:class          ruian:AdresniMisto;\n" +
 //                "    andr:classToLocPath :adresniMistoClassToLocPath;\n" +
