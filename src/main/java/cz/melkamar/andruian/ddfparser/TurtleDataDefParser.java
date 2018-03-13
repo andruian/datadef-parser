@@ -2,14 +2,10 @@ package cz.melkamar.andruian.ddfparser;
 
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
-import cz.melkamar.andruian.ddfparser.model.DataDef;
-import cz.melkamar.andruian.ddfparser.model.LocationClassDef;
-import cz.melkamar.andruian.ddfparser.model.SourceClassDef;
-import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.ValueFactory;
+import cz.melkamar.andruian.ddfparser.model.*;
+import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.util.RDFCollections;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
@@ -22,6 +18,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.PropertyPermission;
 
 public class TurtleDataDefParser implements DataDefParser {
     private static final Logger L = LoggerFactory.getLogger(TurtleDataDefParser.class);
@@ -35,14 +35,24 @@ public class TurtleDataDefParser implements DataDefParser {
         parser.parse(text);
     }
 
+
     @Override
     public DataDef parse(String text) throws RdfFormatException, DataDefFormatException, IOException {
         L.debug("Parsing a string");
         L.trace(text);
-        InputStream stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
-        Model model = Rio.parse(stream, "", RDFFormat.TURTLE);
 
+        Model model = modelFromString(text);
+        return parse(model);
+    }
 
+    @Override
+    public DataDef parse(InputStream textStream) throws RdfFormatException, DataDefFormatException, IOException {
+        Model model = modelFromStream(textStream);
+        return parse(model);
+    }
+
+    @Override
+    public DataDef parse(Model model) throws RdfFormatException, DataDefFormatException, IOException {
         ValueFactory vf = SimpleValueFactory.getInstance();
         IRI DATADEF = URIs.ANDR.DataDef;
         IRI type = URIs.RDF.type;
@@ -74,6 +84,15 @@ public class TurtleDataDefParser implements DataDefParser {
         return null;
     }
 
+    Model modelFromString(String text) throws IOException {
+        InputStream stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        return Rio.parse(stream, "", RDFFormat.TURTLE);
+    }
+
+    Model modelFromStream(InputStream stream) throws IOException {
+        return Rio.parse(stream, "", RDFFormat.TURTLE);
+    }
+
     /**
      * Given a {@link Model} and an IRI of an andr:SourceClassDef resource in this model, construct an instance of
      * {@link SourceClassDef} from this resource.
@@ -82,13 +101,83 @@ public class TurtleDataDefParser implements DataDefParser {
      * @param model             A RDF4J model.
      * @return A {@link SourceClassDef} constructed from the model with the given IRI.
      */
-    public SourceClassDef parseSourceClassDef(IRI sourceClassDefIri, Model model) {
+    public SourceClassDef parseSourceClassDef(IRI sourceClassDefIri, Model model) throws DataDefFormatException {
         L.debug("Parsing a SourceClassDef {}", sourceClassDefIri.toString());
+
+        IRI sparqlEndpoint = getSingleObjectAsIri(sourceClassDefIri, URIs.ANDR.sparqlEndpoint, model);
+        L.debug("Found sparqlEndpoint " + sparqlEndpoint);
+
+        IRI clazz = getSingleObjectAsIri(sourceClassDefIri, URIs.ANDR._class, model);
+        L.debug("Found class " + clazz);
+
+        Model selectPropsModel = model.filter(sourceClassDefIri, URIs.ANDR.selectProperty, null);
+        L.debug("Found {} selectProperties", selectPropsModel.size());
+        SelectProperty[] selectProperties = new SelectProperty[selectPropsModel.size()];
+        int i = 0;
+        for (Statement selectPropStmt : selectPropsModel) {
+            Value selectPropId = selectPropStmt.getObject(); // ID can be a blank node - do not cast to IRI
+            selectProperties[i++] = parseSelectProperty(selectPropId, model);
+        }
+
         throw new NotImplementedException();
     }
 
-    public LocationClassDef parseLocationClassDef(IRI locationClassDefIri, Model model) {
+    SelectProperty parseSelectProperty(Value selectPropertyId, Model model) throws DataDefFormatException {
+        L.debug("Parsing a selectProperty " + selectPropertyId);
+        Value name = getSingleObject((Resource) selectPropertyId, URIs.SCHEMA.name, model);
+        Resource propPathId = getSingleObjectAsResource((Resource) selectPropertyId, URIs.ANDR.propertyPath, model);
+        PropertyPath propertyPath = parsePropertyPath(propPathId, model);
+        return new SelectProperty(name.toString(), propertyPath);
+    }
+
+    PropertyPath parsePropertyPath(Resource propertyPathId, Model model) throws DataDefFormatException {
+        L.debug("Parsing a propertyPath " + propertyPathId);
+        if (model.filter(propertyPathId, URIs.RDF.first, null).isEmpty()) {
+            // Does not have property rdf:first -> is not a rdf:List
+            L.trace("Is a single property path element");
+            if (!(propertyPathId instanceof IRI))
+                throw new DataDefFormatException("A property in Property Path cannot be cast to an IRI: " + propertyPathId +
+                                                         ". Make sure you use <http://iri> instead of \"http://iri\"");
+            return new PropertyPath(propertyPathId.toString());
+        } else {
+            List<Value> values = RDFCollections.asValues(model, propertyPathId, new ArrayList<>());
+            L.trace("Found path elements: " + values);
+            String[] pathElements = new String[values.size()];
+            int i = 0;
+            for (Value value : values) {
+                if (!(value instanceof IRI))
+                    throw new DataDefFormatException("A property in Property Path cannot be cast to an IRI: " + value +
+                                                             ". Make sure you use <http://iri> instead of \"http://iri\"");
+                pathElements[i++] = value.toString();
+            }
+            return new PropertyPath(pathElements);
+        }
+    }
+
+
+    LocationClassDef parseLocationClassDef(IRI locationClassDefIri, Model model) {
         throw new NotImplementedException();
+    }
+
+    Value getSingleObject(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
+        Model objects = model.filter(subject, propertyIri, null);
+        if (objects.size() != 1)
+            throw new DataDefFormatException("For object with IRI " + subject + " expected one property of iri " +
+                                                     propertyIri + " but found " + objects.size());
+
+        return objects.iterator().next().getObject();
+    }
+
+    protected IRI getSingleObjectAsIri(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
+        Value val = getSingleObject(subject, propertyIri, model);
+        if (val instanceof IRI) return (IRI) val;
+        else throw new DataDefFormatException("Could not cast object " + val + " to an IRI.");
+    }
+
+    Resource getSingleObjectAsResource(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
+        Value val = getSingleObject(subject, propertyIri, model);
+        if (val instanceof Resource) return (Resource) val;
+        else throw new DataDefFormatException("Could not cast object " + val + " to a Resource.");
     }
 
 

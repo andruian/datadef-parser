@@ -1,0 +1,10 @@
+@prefix andr: <http://purl.org/net/andruian/datadef#> .
+@prefix ruian: <http://ruian.linked.opendata.cz/ontology/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix s: <http://schema.org/> .
+@prefix ex: <http://example.org/> .
+@prefix : <http://foo/> .
+
+<http://anObject>
+    andr:propertyPath (<http://aProperty> <http://secondProperty> <http://thirdProperty>);
+    .

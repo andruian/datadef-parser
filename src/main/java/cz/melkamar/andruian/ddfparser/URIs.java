@@ -31,6 +31,8 @@ public class URIs {
                 .createIRI(Prefix.andr + "classToLocPath");
         public final static IRI locationClassPathsSource = SimpleValueFactory.getInstance()
                 .createIRI(Prefix.andr + "locationClassPathsSource");
+        public final static IRI propertyPath = SimpleValueFactory.getInstance()
+                .createIRI(Prefix.andr + "propertyPath");
         public final static IRI lat = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "lat");
         public final static IRI _long = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "long");
         public final static IRI locationDef = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "locationDef");
@@ -44,7 +46,12 @@ public class URIs {
         public final static IRI SeqPath = SimpleValueFactory.getInstance().createIRI(Prefix.sp + "SeqPath");
     }
 
+    public static class SCHEMA {
+        public final static IRI name = SimpleValueFactory.getInstance().createIRI(Prefix.s + "name");
+    }
+
     public static class RDF {
         public final static IRI type = SimpleValueFactory.getInstance().createIRI(Prefix.rdf + "type");
+        public final static IRI first = SimpleValueFactory.getInstance().createIRI(Prefix.rdf + "first");
     }
 }
