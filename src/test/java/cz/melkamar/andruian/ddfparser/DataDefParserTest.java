@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -27,11 +28,47 @@ public class DataDefParserTest {
         InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef.ttl",
                                                           this.getClass());
         Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
-        DataDef dataDef = dataDefParser.parse(model);
+        List<DataDef> l = dataDefParser.parse(model);
+        assertEquals(1, l.size());
+        DataDef dataDef = l.get(0);
 
-        assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto", dataDef.getLocationClassDef().getClassUri());
+        assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto",
+                     dataDef.getLocationClassDef().getClassUri());
         assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
         assertFalse(dataDef.getIndexServer().isPresent());
+    }
+
+    /**
+     * Test {@link DataDefParser#parse(Model)} when there are multiple datadefs.
+     */
+    @Test
+    public void parseMultipleDatadefs() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/test-parse-multiple-datadef.ttl",
+                                                          this.getClass());
+        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
+        List<DataDef> l = dataDefParser.parse(model);
+        assertEquals(2, l.size());
+
+        boolean firstChecked = false;
+        boolean secondChecked = false;
+        for (DataDef dataDef : l) {
+            if (dataDef.getUri().equals("http://foo/dataDef")) {
+                assertFalse(firstChecked);
+                firstChecked = true;
+                assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
+                assertEquals("http://localhost:3030/test/query", dataDef.getSourceClassDef().getSparqlEndpoint());
+            } else if (dataDef.getUri().equals("http://foo/dataDefB")) {
+                assertFalse(secondChecked);
+                secondChecked = true;
+                assertEquals("http://AClassB", dataDef.getSourceClassDef().getClassUri());
+                assertEquals("http://localhost:3030/test/queryB", dataDef.getSourceClassDef().getSparqlEndpoint());
+            } else {
+                assertTrue(false);
+            }
+        }
+        assertTrue(firstChecked);
+        assertTrue(secondChecked);
     }
 
     /**
@@ -43,9 +80,12 @@ public class DataDefParserTest {
         InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef-with-indexserver.ttl",
                                                           this.getClass());
         Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
-        DataDef dataDef = dataDefParser.parse(model);
+        List<DataDef> l = dataDefParser.parse(model);
+        assertEquals(1, l.size());
+        DataDef dataDef = l.get(0);
 
-        assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto", dataDef.getLocationClassDef().getClassUri());
+        assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto",
+                     dataDef.getLocationClassDef().getClassUri());
         assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
         assertTrue(dataDef.getIndexServer().isPresent());
         assertEquals("http://someUri", dataDef.getIndexServer().get().getUri());
@@ -200,8 +240,9 @@ public class DataDefParserTest {
         Util.mockHttpClientResponse("http://example.org/some-rdf.ttl", Util.convertStreamToString(externalRdfIs));
 
         DataDefParser dataDefParser = new DataDefParser();
-        InputStream is = Util.readInputStreamFromResource("rdf/locationclassdef/test-parse-locationclassdef-external-parent.ttl",
-                                                          this.getClass());
+        InputStream is = Util.readInputStreamFromResource(
+                "rdf/locationclassdef/test-parse-locationclassdef-external-parent.ttl",
+                this.getClass());
         Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
         LocationClassDef locationClassDef = dataDefParser.parseLocationClassDef(vf.createIRI("http://locationClassDef"),
                                                                                 model);

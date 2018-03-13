@@ -20,7 +20,7 @@ import java.util.*;
 public class DataDefParser {
     private static final Logger L = LoggerFactory.getLogger(DataDefParser.class);
 
-    public DataDef parse(String text, RDFFormat rdfFormat)
+    public List<DataDef> parse(String text, RDFFormat rdfFormat)
             throws RdfFormatException, DataDefFormatException, IOException {
         L.debug("Parsing a string DataDef");
         L.trace(text);
@@ -29,15 +29,16 @@ public class DataDefParser {
         return parse(model);
     }
 
-    public DataDef parse(InputStream textStream, RDFFormat rdfFormat)
+    public List<DataDef> parse(InputStream textStream, RDFFormat rdfFormat)
             throws RdfFormatException, DataDefFormatException, IOException {
         L.debug("Parsing a textStream DataDef");
         Model model = modelFromStream(textStream, rdfFormat);
         return parse(model);
     }
 
-    // TODO test
-    public DataDef parse(Model model) throws RdfFormatException, DataDefFormatException, IOException {
+    public List<DataDef> parse(Model model) throws RdfFormatException, DataDefFormatException, IOException {
+        List<DataDef> result = new ArrayList<>();
+
         // For each datadef, get associated elements
         Model dataDefs = model.filter(null, URIs.RDF.type, URIs.ANDR.DataDef);
         L.debug("Found {} DataDef objects in given text", dataDefs.size());
@@ -61,11 +62,10 @@ public class DataDefParser {
                         .size());
 
             DataDef dataDef = new DataDef(dataDefIri.toString(), locationClassDef, sourceClassDef, indexServer);
-            return dataDef; // TODO allow multiple datadefs
+            result.add(dataDef);
         }
 
-
-        return null;
+        return result;
     }
 
     Model modelFromString(String text, RDFFormat rdfFormat) throws IOException {
