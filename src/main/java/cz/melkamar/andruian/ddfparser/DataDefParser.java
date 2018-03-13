@@ -68,12 +68,12 @@ public class DataDefParser {
         return result;
     }
 
-    Model modelFromString(String text, RDFFormat rdfFormat) throws IOException {
+    public Model modelFromString(String text, RDFFormat rdfFormat) throws IOException {
         InputStream stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
         return Rio.parse(stream, "", rdfFormat);
     }
 
-    Model modelFromStream(InputStream stream, RDFFormat rdfFormat) throws IOException {
+    public Model modelFromStream(InputStream stream, RDFFormat rdfFormat) throws IOException {
         return Rio.parse(stream, "", rdfFormat);
     }
 
@@ -143,7 +143,7 @@ public class DataDefParser {
      * @return a {@link SelectProperty} construted from the given resource.
      * @throws DataDefFormatException When the data is malformed, e.g. a mandatory property is not provided.
      */
-    SelectProperty parseSelectProperty(Resource selectPropertyId, Model model) throws DataDefFormatException {
+    public SelectProperty parseSelectProperty(Resource selectPropertyId, Model model) throws DataDefFormatException {
         L.debug("Parsing a selectProperty " + selectPropertyId);
         String name = Models.getPropertyLiteral(model, selectPropertyId, URIs.SCHEMA.name)
                 .orElseThrow(() -> new DataDefFormatException("Could not find a literal linked to SelectPropertyDef "
@@ -169,7 +169,7 @@ public class DataDefParser {
      * @return A {@link PropertyPath} constructed from the given SHACL path.
      * @throws DataDefFormatException When the property path cannot be parsed. Possibly malformed or not supported.
      */
-    PropertyPath parsePropertyPath(Resource propertyPathId, Model model) throws DataDefFormatException {
+    public PropertyPath parsePropertyPath(Resource propertyPathId, Model model) throws DataDefFormatException {
         L.debug("Parsing a propertyPath " + propertyPathId);
         if (model.filter(propertyPathId, URIs.RDF.first, null).isEmpty()) {
             // Does not have property rdf:first -> is not a rdf:List
@@ -201,7 +201,7 @@ public class DataDefParser {
      * @return A parsed {@link LocationClassDef} object.
      * @throws DataDefFormatException When the data is malformed, e.g. a mandatory property is not provided.
      */
-    LocationClassDef parseLocationClassDef(Resource locationClassDefResource, Model model)
+    public LocationClassDef parseLocationClassDef(Resource locationClassDefResource, Model model)
             throws DataDefFormatException {
         L.debug("Parsing a LocationClassDef " + locationClassDefResource);
 
@@ -262,7 +262,7 @@ public class DataDefParser {
      * @return A {@link ClassToLocPath} object.
      * @throws DataDefFormatException When the data is malformed, e.g. a mandatory property is not provided.
      */
-    ClassToLocPath parseClassToLocPath(Resource classToLocPath, Model model) throws DataDefFormatException {
+    public ClassToLocPath parseClassToLocPath(Resource classToLocPath, Model model) throws DataDefFormatException {
         L.debug("Parsing a classToLocPath " + classToLocPath);
         IRI clazz = getSingleObjectAsIri(classToLocPath, URIs.ANDR._class, model);
 
@@ -282,7 +282,7 @@ public class DataDefParser {
      * @param rdfIri IRI to the RDF to be added to the model.
      * @param model  A model to expand with the data from a RDF file.
      */
-    void processIncludeRdf(IRI rdfIri, Model model) throws DataDefFormatException {
+    protected void processIncludeRdf(IRI rdfIri, Model model) throws DataDefFormatException {
         L.debug("Including data from RDF " + rdfIri);
         try {
             InputStream is = Util.getHttp(rdfIri.toString());
@@ -303,7 +303,7 @@ public class DataDefParser {
      * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
      * @throws DataDefFormatException If none or more than one such value exists.
      */
-    Value getSingleObject(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
+    protected Value getSingleObject(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
         Model objects = model.filter(subject, propertyIri, null);
         if (objects.size() != 1)
             throw new DataDefFormatException("For object with IRI " + subject + " expected one property of iri " +
@@ -336,7 +336,7 @@ public class DataDefParser {
      * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
      * @throws DataDefFormatException If none or more than one such Resource exists or if the linked value cannot be cast to a Resource.
      */
-    Resource getSingleObjectAsResource(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
+    protected Resource getSingleObjectAsResource(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
         Value val = getSingleObject(subject, propertyIri, model);
         if (val instanceof Resource) return (Resource) val;
         else throw new DataDefFormatException("Could not cast object " + val + " to a Resource.");
