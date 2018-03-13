@@ -2,6 +2,25 @@
 
 [![Build Status](https://travis-ci.org/andruian/datadef-parser.svg?branch=master)](https://travis-ci.org/andruian/datadef-parser)
 
+## Installation
+#### Plain Java
+To use this library in a regular Java project, build a jar and include it on classpath: 
+```
+$ gradlew clean test jar
+```
+#### Maven or Gradle
+To use this library in Maven or Gradle, run this task to put the jar in your local Maven repository:
+```
+$ gradlew publishToMavenLocal
+```
+You will then need to set up your build to use local Maven repository as a source repository. Put this in the root
+of `build.gradle`:
+```
+repositories {
+    mavenLocal()
+}
+```
+
 ## Usage
 
 The main class responsible for parsing is `DataDefParser`. Use it to convert a RDF file to a hierarchy of 
