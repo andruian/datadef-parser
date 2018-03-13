@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public class DatadefParser {
+public class Rdf4jDatadefParser {
     public String parse() {
         InputStream stream = new ByteArrayInputStream(foostr().getBytes(StandardCharsets.UTF_8));
         String lines[] = foostr().split("\\r?\\n");
