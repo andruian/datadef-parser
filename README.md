@@ -12,7 +12,7 @@ RDF format that RDF4J can. Pass the format to the `DataDefParser#parse()` method
 
 #### Example code:
 ```java
-InputStream is = null;
+InputStream is = null; // Provide your own
 List<DataDef> l = new DataDefParser().parse(is, RDFFormat.TURTLE);      
 ```
 
