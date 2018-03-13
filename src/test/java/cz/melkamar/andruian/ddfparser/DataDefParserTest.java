@@ -27,8 +27,7 @@ public class DataDefParserTest {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef.ttl",
                                                           this.getClass());
-        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
-        List<DataDef> l = dataDefParser.parse(model);
+        List<DataDef> l = dataDefParser.parse(is, RDFFormat.TURTLE);
         assertEquals(1, l.size());
         DataDef dataDef = l.get(0);
 
