@@ -4,6 +4,7 @@ import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.*;
 import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.util.Models;
 import org.eclipse.rdf4j.model.util.RDFCollections;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class TurtleDataDefParser implements DataDefParser {
     private static final Logger L = LoggerFactory.getLogger(TurtleDataDefParser.class);
@@ -107,25 +109,38 @@ public class TurtleDataDefParser implements DataDefParser {
         IRI clazz = getSingleObjectAsIri(sourceClassDefIri, URIs.ANDR._class, model);
         L.debug("Found class " + clazz);
 
-        Model selectPropsModel = model.filter(sourceClassDefIri, URIs.ANDR.selectProperty, null);
-        L.debug("Found {} selectProperties", selectPropsModel.size());
-        SelectProperty[] selectProperties = new SelectProperty[selectPropsModel.size()];
+        Set<Resource> selectPropsResources = Models.getPropertyResources(model,
+                                                                         sourceClassDefIri,
+                                                                         URIs.ANDR.selectProperty);
+        L.debug("Found {} selectProperties", selectPropsResources.size());
+        SelectProperty[] selectProperties = new SelectProperty[selectPropsResources.size()];
         int i = 0;
-        for (Statement selectPropStmt : selectPropsModel) {
-            Value selectPropId = selectPropStmt.getObject(); // ID can be a blank node - do not cast to IRI
-            selectProperties[i++] = parseSelectProperty(selectPropId, model);
+        for (Resource selectPropResource : selectPropsResources) {
+            selectProperties[i++] = parseSelectProperty(selectPropResource, model);
         }
 
         throw new NotImplementedException();
     }
 
-    // TODO test
-    SelectProperty parseSelectProperty(Value selectPropertyId, Model model) throws DataDefFormatException {
+    /**
+     * Construct an instance of {@link SelectProperty} from the given andr:SelectPropertyDef resource.
+     *
+     * @param selectPropertyId An andr:SelectPropertyDef resource in the given model.
+     * @param model            A RDF4J model.
+     * @return a {@link SelectProperty} construted from the given resource.
+     * @throws DataDefFormatException When the data is malformed, e.g. a mandatory property is not provided.
+     */
+    SelectProperty parseSelectProperty(Resource selectPropertyId, Model model) throws DataDefFormatException {
         L.debug("Parsing a selectProperty " + selectPropertyId);
-        Value name = getSingleObject((Resource) selectPropertyId, URIs.SCHEMA.name, model);
-        Resource propPathId = getSingleObjectAsResource((Resource) selectPropertyId, URIs.ANDR.propertyPath, model);
+        String name = Models.getPropertyLiteral(model, selectPropertyId, URIs.SCHEMA.name)
+                .orElseThrow(() -> new DataDefFormatException("Could not find a literal linked to SelectPropertyDef "
+                                                                      + selectPropertyId + " via property " + URIs.SCHEMA.name))
+                .getLabel();
+
+        L.trace("Found name " + name);
+        Resource propPathId = getSingleObjectAsResource(selectPropertyId, URIs.ANDR.propertyPath, model);
         PropertyPath propertyPath = parsePropertyPath(propPathId, model);
-        return new SelectProperty(name.toString(), propertyPath);
+        return new SelectProperty(name, propertyPath);
     }
 
     /**

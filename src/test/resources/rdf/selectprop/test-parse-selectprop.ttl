@@ -1,0 +1,24 @@
+@prefix andr: <http://purl.org/net/andruian/datadef#> .
+@prefix ruian: <http://ruian.linked.opendata.cz/ontology/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix s: <http://schema.org/> .
+@prefix ex: <http://example.org/> .
+@prefix : <http://foo/> .
+
+#
+# Test parsing a SelectPropertyDef attached to an object both as a blank node and as a regular resource
+#
+
+<http://anObject>
+    andr:selectProperty <http://aSelectProp>;
+    andr:selectProperty [ a andr:SelectPropertyDef;
+                          s:name "foobarblank";
+                          andr:propertyPath (<http://firstblank> <http://secondblank>)
+                        ];
+    .
+
+<http://aSelectProp>
+    a andr:SelectPropertyDef;
+    s:name "foobarlinked";
+    andr:propertyPath (<http://firstlinked> <http://secondlinked>)
+    .
