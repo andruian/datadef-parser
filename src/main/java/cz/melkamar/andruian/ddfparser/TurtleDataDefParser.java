@@ -192,6 +192,37 @@ public class TurtleDataDefParser implements DataDefParser {
     }
 
     /**
+     * Construct an instance of {@link ClassToLocPath} from a andr:ClassToLocPath resource.
+     *
+     * @param classToLocPath A andr:ClassToLocPath resource.
+     * @param model A model containing the resource.
+     * @return A {@link ClassToLocPath} object.
+     * @throws DataDefFormatException When the data is malformed, e.g. a mandatory property is not provided.
+     */
+    ClassToLocPath parseClassToLocPath(Resource classToLocPath, Model model) throws DataDefFormatException {
+        IRI clazz = getSingleObjectAsIri(classToLocPath, URIs.ANDR._class, model);
+
+        Resource latResource = getSingleObjectAsResource(classToLocPath, URIs.ANDR.lat, model);
+        PropertyPath latPath = parsePropertyPath(latResource, model);
+
+        Resource lngResource = getSingleObjectAsResource(classToLocPath, URIs.ANDR._long, model);
+        PropertyPath lngPath = parsePropertyPath(lngResource, model);
+
+        return new ClassToLocPath(latPath, lngPath, clazz.toString());
+    }
+
+    /**
+     * Process all andr:inludeRdf properties linked from the given resource.
+     * Add data from the files to the current model.
+     *
+     * @param rdfIri IRI to the RDF to be added to the model.
+     * @param model A model to expand with the data from a RDF file.
+     */
+    void processIncludeRdf(IRI rdfIri, Model model) {
+
+    }
+
+    /**
      * Read a {@link Value} linked to the given subject via a property. Assert that one and only one such value exists.
      *
      * @param subject     A {@link Resource} from which to read.

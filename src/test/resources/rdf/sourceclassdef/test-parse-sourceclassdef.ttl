@@ -5,10 +5,6 @@
 @prefix ex: <http://example.org/> .
 @prefix : <http://foo/> .
 
-#<http://anObject>
-#    andr:sourceClassDef <http://sourceClassDef>;
-#    .
-#
 <http://sourceClassDef>
     a                        andr:SourceClassDef;
     andr:sparqlEndpoint      <http://localhost:3030/test/query>;
