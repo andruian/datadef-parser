@@ -7,9 +7,54 @@
 
 :dataDef
     a                 andr:DataDef;
-    andr:locationClassDef  :locationClassDef;
-    andr:sourceClassDef :sourceClassDef;
+    andr:locationClassDef  <http://locationClassDef>;
+    andr:sourceClassDef <http://sourceClassDef>;
     .
+
+#
+# SourceClassDef
+#
+<http://sourceClassDef>
+    a                        andr:SourceClassDef;
+    andr:sparqlEndpoint      <http://localhost:3030/test/query>;
+    andr:class               <http://AClass>;
+    andr:pathToLocationClass ( <http://A> <http://B> <http://C> <http://D> );
+    andr:selectProperty [ a andr:SelectPropertyDef;
+                          s:name "foobarblank";
+                          andr:propertyPath (<http://firstblank> <http://secondblank>)
+                        ];
+    .
+
+
+#
+# LocationClassDef
+#
+<http://locationClassDef>
+    a                   andr:LocationDef;
+    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
+    andr:class          ruian:AdresniMisto;
+    andr:classToLocPath :adresniMistoClassToLocPath;
+    andr:classToLocPath [a   andr:ClassToLocPath;
+                             andr:class <http://classA>;
+                             andr:lat   <http://A>;
+                             andr:long  ( <http://X> <http://Y> <http://Z> );
+                        ];
+    .
+
+:adresniMistoClassToLocPath
+    a          andr:ClassToLocPath;
+    andr:class <http://classB>;
+    andr:lat   ( <http://A> <http://B> );
+    andr:long  ( <http://X> <http://Y> );
+    .
+
+
+
+
+
+
+
+
 
 #
 # DATA DEFINITION

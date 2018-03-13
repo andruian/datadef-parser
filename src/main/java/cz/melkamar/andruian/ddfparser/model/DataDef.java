@@ -1,9 +1,21 @@
 package cz.melkamar.andruian.ddfparser.model;
 
+import java.util.Optional;
+
 public class DataDef {
     private final String uri;
     private final LocationClassDef locationClassDef;
     private final SourceClassDef sourceClassDef;
+    private final IndexServer indexServer;
+
+    public DataDef(String uri,
+                   LocationClassDef locationClassDef,
+                   SourceClassDef sourceClassDef, IndexServer indexServer) {
+        this.uri = uri;
+        this.locationClassDef = locationClassDef;
+        this.sourceClassDef = sourceClassDef;
+        this.indexServer = indexServer;
+    }
 
     public DataDef(String uri,
                    LocationClassDef locationClassDef,
@@ -11,6 +23,7 @@ public class DataDef {
         this.uri = uri;
         this.locationClassDef = locationClassDef;
         this.sourceClassDef = sourceClassDef;
+        indexServer = null;
     }
 
     public String getUri() {
@@ -23,6 +36,10 @@ public class DataDef {
 
     public SourceClassDef getSourceClassDef() {
         return sourceClassDef;
+    }
+
+    public Optional<IndexServer> getIndexServer() {
+        return Optional.ofNullable(indexServer);
     }
 
     @Override
