@@ -35,10 +35,11 @@ public class URIs {
                 .createIRI(Prefix.andr + "propertyPath");
         public final static IRI lat = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "lat");
         public final static IRI _long = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "long");
-        public final static IRI locationDef = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "locationDef");
+        public final static IRI locationClassDef = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "locationClassDef");
         public final static IRI includeRdf = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "includeRdf");
         public final static IRI uri = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "uri");
         public final static IRI version = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "version");
+        public final static IRI indexServer = SimpleValueFactory.getInstance().createIRI(Prefix.andr + "indexServer");
     }
 
     public static class SP {

@@ -1,6 +1,7 @@
 package cz.melkamar.andruian.ddfparser;
 
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
+import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.*;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
@@ -19,6 +20,39 @@ public class DataDefParserTest {
 
     /**
      * Test {@link DataDefParser#parse(Model)}
+     */
+    @Test
+    public void parse() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef.ttl",
+                                                          this.getClass());
+        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
+        DataDef dataDef = dataDefParser.parse(model);
+
+        assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto", dataDef.getLocationClassDef().getClassUri());
+        assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
+        assertFalse(dataDef.getIndexServer().isPresent());
+    }
+
+    /**
+     * Test {@link DataDefParser#parse(Model)}
+     */
+    @Test
+    public void parseWithIndexServer() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef-with-indexserver.ttl",
+                                                          this.getClass());
+        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
+        DataDef dataDef = dataDefParser.parse(model);
+
+        assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto", dataDef.getLocationClassDef().getClassUri());
+        assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
+        assertTrue(dataDef.getIndexServer().isPresent());
+        assertEquals("http://someUri", dataDef.getIndexServer().get().getUri());
+    }
+
+    /**
+     * Test {@link DataDefParser#parseIndexServer(Resource, Model)}.
      */
     @Test
     public void parseIndexServer() throws IOException, DataDefFormatException {

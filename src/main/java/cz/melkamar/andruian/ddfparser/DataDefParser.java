@@ -45,19 +45,22 @@ public class DataDefParser {
             IRI dataDefIri = (IRI) st.getSubject();
             L.debug("Parsing DataDef {}", dataDefIri.toString());
 
-            Model srcClassDefs = model.filter(dataDefIri, URIs.ANDR.sourceClassDef, null);
-            if (srcClassDefs.size() != 1)
-                throw new DataDefFormatException("A DataDef must have one linked andr:sourceClassDef property.");
-            IRI sourceClassDefIri = (IRI) srcClassDefs.objects().iterator().next();
-            SourceClassDef sourceClassDef = parseSourceClassDef(sourceClassDefIri, model);
+            Resource sourceClassDefResource = getSingleObjectAsResource(dataDefIri, URIs.ANDR.sourceClassDef, model);
+            SourceClassDef sourceClassDef = parseSourceClassDef(sourceClassDefResource, model);
 
-            Model locClassDefs = model.filter(dataDefIri, URIs.ANDR.locationDef, null);
-            if (locClassDefs.size() != 1)
-                throw new DataDefFormatException("A DataDef must have one linked andr:locationClassDef property.");
-            IRI locationClassDefIri = (IRI) locClassDefs.objects().iterator().next();
-            LocationClassDef locationClassDef = parseLocationClassDef(locationClassDefIri, model);
+            Resource locationClassDefResource = getSingleObjectAsResource(dataDefIri,
+                                                                          URIs.ANDR.locationClassDef,
+                                                                          model);
+            LocationClassDef locationClassDef = parseLocationClassDef(locationClassDefResource, model);
 
-            DataDef dataDef = new DataDef(dataDefIri.toString(), locationClassDef, sourceClassDef);
+            Set<Resource> indexServerSet = Models.getPropertyResources(model, dataDefIri, URIs.ANDR.indexServer);
+            IndexServer indexServer = null;
+            if (indexServerSet.size() == 1) indexServer = parseIndexServer(indexServerSet.iterator().next(), model);
+            else if (indexServerSet.size() > 1)
+                throw new DataDefFormatException("Expected zero or one properties of type andr:uri. Found " + indexServerSet
+                        .size());
+
+            DataDef dataDef = new DataDef(dataDefIri.toString(), locationClassDef, sourceClassDef, indexServer);
             return dataDef; // TODO allow multiple datadefs
         }
 

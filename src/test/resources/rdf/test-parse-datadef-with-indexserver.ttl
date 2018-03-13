@@ -9,6 +9,16 @@
     a                 andr:DataDef;
     andr:locationClassDef  <http://locationClassDef>;
     andr:sourceClassDef <http://sourceClassDef>;
+    andr:indexServer <http://indexserver>;
+    .
+
+#
+# Indexserver
+#
+<http://indexserver>
+    a                 andr:IndexServer;
+    andr:uri  <http://someUri>;
+    andr:version 1;
     .
 
 #
