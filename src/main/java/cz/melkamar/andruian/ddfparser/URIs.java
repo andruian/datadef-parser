@@ -35,7 +35,7 @@ public class URIs {
         public final static String sp = "http://spinrdf.org/sp#";
         public final static String s = "http://schema.org/";
         public final static String ex = "http://example.org/";
-        public final static String BLANK = "http://foo/";
+        public final static String SKOS = "http://www.w3.org/2004/02/skos/core#";
     }
 
     public static class ANDR {
@@ -80,5 +80,9 @@ public class URIs {
     public static class RDF {
         public final static IRI type = SimpleValueFactory.getInstance().createIRI(Prefix.rdf + "type");
         public final static IRI first = SimpleValueFactory.getInstance().createIRI(Prefix.rdf + "first");
+    }
+
+    public static class SKOS {
+        public final static IRI prefLabel = SimpleValueFactory.getInstance().createIRI(Prefix.SKOS + "prefLabel");
     }
 }

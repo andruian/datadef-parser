@@ -1,0 +1,73 @@
+@prefix andr: <http://purl.org/net/andruian/datadef#> .
+@prefix ruian: <http://ruian.linked.opendata.cz/ontology/> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix s: <http://schema.org/> .
+@prefix ex: <http://example.org/> .
+@prefix : <http://foo/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+
+<http://datadefA>
+    a                 andr:DataDef;
+    andr:locationClassDef  <http://locationClassDef>;
+    andr:sourceClassDef <http://sourceClassDef>;
+    .
+
+<http://datadefB>
+    a                 andr:DataDef;
+    andr:locationClassDef  <http://locationClassDef>;
+    andr:sourceClassDef <http://sourceClassDef>;
+    skos:prefLabel "A testing label";
+    .
+
+<http://datadefC>
+    a                 andr:DataDef;
+    andr:locationClassDef  <http://locationClassDef>;
+    andr:sourceClassDef <http://sourceClassDef>;
+    skos:prefLabel "A testing label"@en;
+    .
+
+<http://datadefD>
+    a                 andr:DataDef;
+    andr:locationClassDef  <http://locationClassDef>;
+    andr:sourceClassDef <http://sourceClassDef>;
+    skos:prefLabel "A testing label";
+    skos:prefLabel "Testovaci napis"@cs;
+    .
+
+#
+# SourceClassDef
+#
+<http://sourceClassDef>
+    a                        andr:SourceClassDef;
+    andr:sparqlEndpoint      <http://localhost:3030/test/query>;
+    andr:class               <http://AClass>;
+    andr:pathToLocationClass ( <http://A> <http://B> <http://C> <http://D> );
+    andr:selectProperty [ a andr:SelectPropertyDef;
+                          s:name "foobarblank";
+                          andr:propertyPath (<http://firstblank> <http://secondblank>)
+                        ];
+    .
+
+
+#
+# LocationClassDef
+#
+<http://locationClassDef>
+    a                   andr:LocationDef;
+    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
+    andr:class          ruian:AdresniMisto;
+    andr:classToLocPath :adresniMistoClassToLocPath;
+    andr:classToLocPath [a   andr:ClassToLocPath;
+                             andr:class <http://classA>;
+                             andr:lat   <http://A>;
+                             andr:long  ( <http://X> <http://Y> <http://Z> );
+                        ];
+    .
+
+:adresniMistoClassToLocPath
+    a          andr:ClassToLocPath;
+    andr:class <http://classB>;
+    andr:lat   ( <http://A> <http://B> );
+    andr:long  ( <http://X> <http://Y> );
+    .

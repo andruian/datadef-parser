@@ -24,6 +24,8 @@
 
 package cz.melkamar.andruian.ddfparser.model;
 
+import javax.swing.text.html.Option;
+import java.util.Map;
 import java.util.Optional;
 
 public class DataDef {
@@ -31,24 +33,22 @@ public class DataDef {
     private final LocationClassDef locationClassDef;
     private final SourceClassDef sourceClassDef;
     private final IndexServer indexServer;
+    private final Map<String, String> labels;
+
+    public static final String NO_LANG = "__nolang__";
 
     public DataDef(String uri,
                    LocationClassDef locationClassDef,
-                   SourceClassDef sourceClassDef, IndexServer indexServer) {
+                   SourceClassDef sourceClassDef,
+                   IndexServer indexServer,
+                   Map<String, String> labels) {
         this.uri = uri;
         this.locationClassDef = locationClassDef;
         this.sourceClassDef = sourceClassDef;
         this.indexServer = indexServer;
+        this.labels = labels;
     }
 
-    public DataDef(String uri,
-                   LocationClassDef locationClassDef,
-                   SourceClassDef sourceClassDef) {
-        this.uri = uri;
-        this.locationClassDef = locationClassDef;
-        this.sourceClassDef = sourceClassDef;
-        indexServer = null;
-    }
 
     public String getUri() {
         return uri;
@@ -64,6 +64,23 @@ public class DataDef {
 
     public Optional<IndexServer> getIndexServer() {
         return Optional.ofNullable(indexServer);
+    }
+
+    /**
+     * Get a skos:prefLabel of this DataDef of the given language.
+     * @param language A language string as used in RDF, e.g. for "something"@en the language string will be "en"
+     * @return A label in the given language or an empty Optional object if it does not exist.
+     */
+    public Optional<String> getLabel(String language) {
+        return Optional.ofNullable(labels.get(language));
+    }
+
+    /**
+     * Get a skos:prefLabel of this DataDef without any language specified.
+     * @return A label without a language tag or an empty Optional object if it does not exist.
+     */
+    public Optional<String> getLabel() {
+        return Optional.ofNullable(labels.get(NO_LANG));
     }
 
     @Override

@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +93,59 @@ public class DataDefParserTest {
         }
         assertTrue(firstChecked);
         assertTrue(secondChecked);
+    }
+
+    /**
+     * Test {@link DataDefParser#parse(Model)}
+     */
+    @Test
+    public void parseDataDefLabel() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef-preflabel.ttl",
+                                                          this.getClass());
+        List<DataDef> l = dataDefParser.parse(is, RDFFormat.TURTLE);
+        assertEquals(4, l.size());
+        boolean[] tested = new boolean[4];
+        for (DataDef dataDef : l) {
+            switch (dataDef.getUri()) {
+                case "http://datadefA":
+                    assertFalse(tested[0]);
+                    tested[0] = true;
+                    assertFalse(dataDef.getLabel().isPresent());
+                    assertFalse(dataDef.getLabel("en").isPresent());
+                    assertFalse(dataDef.getLabel("cs").isPresent());
+                    break;
+                case "http://datadefB":
+                    assertFalse(tested[1]);
+                    tested[1] = true;
+                    assertTrue(dataDef.getLabel().isPresent());
+                    assertEquals("A testing label", dataDef.getLabel().get());
+                    assertFalse(dataDef.getLabel("en").isPresent());
+                    assertFalse(dataDef.getLabel("cs").isPresent());
+                    break;
+                case "http://datadefC":
+                    assertFalse(tested[2]);
+                    tested[2] = true;
+                    assertFalse(dataDef.getLabel().isPresent());
+                    assertTrue(dataDef.getLabel("en").isPresent());
+                    assertEquals("A testing label", dataDef.getLabel("en").get());
+                    assertFalse(dataDef.getLabel("cs").isPresent());
+                    break;
+                case "http://datadefD":
+                    assertFalse(tested[3]);
+                    tested[3] = true;
+                    assertTrue(dataDef.getLabel().isPresent());
+                    assertEquals("A testing label", dataDef.getLabel().get());
+                    assertFalse(dataDef.getLabel("en").isPresent());
+                    assertTrue(dataDef.getLabel("cs").isPresent());
+                    assertEquals("Testovaci napis", dataDef.getLabel("cs").get());
+                    break;
+            }
+        }
+
+        for (boolean b : tested) {
+            assertTrue(b);
+        }
     }
 
     /**

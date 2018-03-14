@@ -85,8 +85,17 @@ public class DataDefParser {
                 throw new DataDefFormatException("Expected zero or one properties of type andr:uri. Found " + indexServerSet
                         .size());
 
-            DataDef dataDef = new DataDef(dataDefIri.toString(), locationClassDef, sourceClassDef, indexServer);
-            result.add(dataDef);
+            DataDefBuilder builder = new DataDefBuilder(dataDefIri.toString(), locationClassDef, sourceClassDef)
+                    .addIndexServer(indexServer);
+
+            // Process labels
+            Set<Literal> labels = Models.getPropertyLiterals(model, dataDefIri, URIs.SKOS.prefLabel);
+            for (Literal label : labels) {
+                String lang = label.getLanguage().orElse(DataDef.NO_LANG);
+                builder.addLabel(lang, label.getLabel());
+            }
+
+            result.add(builder.createDataDef());
         }
 
         return result;
@@ -360,7 +369,8 @@ public class DataDefParser {
      * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
      * @throws DataDefFormatException If none or more than one such Resource exists or if the linked value cannot be cast to a Resource.
      */
-    protected Resource getSingleObjectAsResource(Resource subject, IRI propertyIri, Model model) throws DataDefFormatException {
+    protected Resource getSingleObjectAsResource(Resource subject, IRI propertyIri, Model model)
+            throws DataDefFormatException {
         Value val = getSingleObject(subject, propertyIri, model);
         if (val instanceof Resource) return (Resource) val;
         else throw new DataDefFormatException("Could not cast object " + val + " to a Resource.");
