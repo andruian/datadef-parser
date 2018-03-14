@@ -31,6 +31,7 @@ import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.util.Models;
 import org.eclipse.rdf4j.model.util.RDFCollections;
 import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,13 +102,21 @@ public class DataDefParser {
         return result;
     }
 
-    public Model modelFromString(String text, RDFFormat rdfFormat) throws IOException {
+    public Model modelFromString(String text, RDFFormat rdfFormat) throws IOException, RdfFormatException {
         InputStream stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
-        return Rio.parse(stream, "", rdfFormat);
+        try {
+            return Rio.parse(stream, "", rdfFormat);
+        } catch (RDFParseException e) {
+            throw new RdfFormatException(e);
+        }
     }
 
-    public Model modelFromStream(InputStream stream, RDFFormat rdfFormat) throws IOException {
-        return Rio.parse(stream, "", rdfFormat);
+    public Model modelFromStream(InputStream stream, RDFFormat rdfFormat) throws IOException, RdfFormatException {
+        try {
+            return Rio.parse(stream, "", rdfFormat);
+        } catch (RDFParseException e) {
+            throw new RdfFormatException(e);
+        }
     }
 
     public IndexServer parseIndexServer(Resource indexServerResource, Model model) throws DataDefFormatException {
@@ -235,7 +244,7 @@ public class DataDefParser {
      * @throws DataDefFormatException When the data is malformed, e.g. a mandatory property is not provided.
      */
     public LocationClassDef parseLocationClassDef(Resource locationClassDefResource, Model model)
-            throws DataDefFormatException {
+            throws DataDefFormatException, RdfFormatException {
         L.debug("Parsing a LocationClassDef " + locationClassDefResource);
 
         // Include data from any RDFs linked
@@ -315,7 +324,7 @@ public class DataDefParser {
      * @param rdfIri IRI to the RDF to be added to the model.
      * @param model  A model to expand with the data from a RDF file.
      */
-    protected void processIncludeRdf(IRI rdfIri, Model model) throws DataDefFormatException {
+    protected void processIncludeRdf(IRI rdfIri, Model model) throws DataDefFormatException, RdfFormatException {
         L.debug("Including data from RDF " + rdfIri);
         try {
             InputStream is = Util.getHttp(rdfIri.toString());
@@ -324,6 +333,8 @@ public class DataDefParser {
         } catch (IOException e) {
             L.error("Could not HTTP GET a file", e);
             throw new DataDefFormatException("Error while including a remote RDF file", e);
+        } catch (RDFParseException e) {
+            throw new RdfFormatException(e);
         }
     }
 

@@ -25,6 +25,7 @@
 package cz.melkamar.andruian.ddfparser;
 
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
+import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.PropertyPath;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
@@ -42,7 +43,7 @@ public class PropertyPathDataDefParserTest {
     SimpleValueFactory vf = SimpleValueFactory.getInstance();
 
     @Test
-    public void parsePropertyPathSingle() throws IOException, DataDefFormatException {
+    public void parsePropertyPathSingle() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/proppath/test-property-path-single.ttl",
                                                           this.getClass());
@@ -59,7 +60,7 @@ public class PropertyPathDataDefParserTest {
     }
 
     @Test
-    public void parsePropertyPathTwoProps() throws IOException, DataDefFormatException {
+    public void parsePropertyPathTwoProps() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/proppath/test-property-path-two-props.ttl",
                                                           this.getClass());
@@ -77,7 +78,7 @@ public class PropertyPathDataDefParserTest {
     }
 
     @Test
-    public void parsePropertyPathThreeProps() throws IOException, DataDefFormatException {
+    public void parsePropertyPathThreeProps() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/proppath/test-property-path-three-props.ttl",
                                                           this.getClass());

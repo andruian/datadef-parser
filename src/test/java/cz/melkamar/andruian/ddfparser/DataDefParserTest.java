@@ -34,7 +34,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -169,10 +168,22 @@ public class DataDefParserTest {
     }
 
     /**
+     * Test parsing a malformed RDF file
+     */
+    @Test(expected = RdfFormatException.class)
+    public void parseMalformed() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/malformed/test-malformed-rdf.ttl",
+                                                          this.getClass());
+        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
+        List<DataDef> l = dataDefParser.parse(model);
+    }
+
+    /**
      * Test {@link DataDefParser#parseIndexServer(Resource, Model)}.
      */
     @Test
-    public void parseIndexServer() throws IOException, DataDefFormatException {
+    public void parseIndexServer() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/test-parse-indexserver.ttl",
                                                           this.getClass());
@@ -192,7 +203,7 @@ public class DataDefParserTest {
      * to a SelectPropertyDef resource is parsed correctly.
      */
     @Test
-    public void parseSelectPropertyDef() throws IOException, DataDefFormatException {
+    public void parseSelectPropertyDef() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/selectprop/test-parse-selectprop.ttl",
                                                           this.getClass());
@@ -231,7 +242,7 @@ public class DataDefParserTest {
      * Test {@link DataDefParser#parseSourceClassDef(Resource, Model)}.
      */
     @Test
-    public void parseSourceClassDef() throws IOException, DataDefFormatException {
+    public void parseSourceClassDef() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/sourceclassdef/test-parse-sourceclassdef.ttl",
                                                           this.getClass());
@@ -254,7 +265,7 @@ public class DataDefParserTest {
      * Test {@link DataDefParser#parseClassToLocPath(Resource, Model)} .
      */
     @Test
-    public void parseClassToLocPath() throws IOException, DataDefFormatException {
+    public void parseClassToLocPath() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/classtolocpath/test-parse-class-to-loc-path.ttl",
                                                           this.getClass());
@@ -279,7 +290,7 @@ public class DataDefParserTest {
      * Test {@link DataDefParser#parseLocationClassDef(Resource, Model)}  .
      */
     @Test
-    public void parseLocationClassDef() throws IOException, DataDefFormatException {
+    public void parseLocationClassDef() throws IOException, DataDefFormatException, RdfFormatException {
         DataDefParser dataDefParser = new DataDefParser();
         InputStream is = Util.readInputStreamFromResource("rdf/locationclassdef/test-parse-locationclassdef.ttl",
                                                           this.getClass());
@@ -310,7 +321,7 @@ public class DataDefParserTest {
      * RDF file and check if including it works.
      */
     @Test
-    public void parseLocationClassDefExternal() throws IOException, DataDefFormatException {
+    public void parseLocationClassDefExternal() throws IOException, DataDefFormatException, RdfFormatException {
         InputStream externalRdfIs = Util.readInputStreamFromResource(
                 "rdf/locationclassdef/test-parse-locationclassdef-external-child.ttl",
                 this.getClass());
