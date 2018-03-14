@@ -28,18 +28,10 @@ import cz.melkamar.andruian.ddfparser.exception.InvalidMockParameterException;
 
 import java.io.*;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 public class Util {
-    public static void main(String[] args) {
-        Optional<Integer> x = Optional.of(456);
-        System.out.println(x);
-    }
-
     public static InputStream readInputStreamFromResource(String resourcePath, Class clazz) throws IOException {
-//        return new Scanner(clazz.getResourceAsStream(resourcePath), "UTF-8").useDelimiter("\\A").next();
         ClassLoader classLoader = clazz.getClassLoader();
         File file = new File(classLoader.getResource(resourcePath).getFile());
         return new FileInputStream(file);

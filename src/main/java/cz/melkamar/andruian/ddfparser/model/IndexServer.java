@@ -24,8 +24,6 @@
 
 package cz.melkamar.andruian.ddfparser.model;
 
-import java.util.Optional;
-
 public class IndexServer {
     private final String uri;
     private final int version;
@@ -47,8 +45,16 @@ public class IndexServer {
         return uri;
     }
 
-    public Optional<Integer> getVersion() {
-        if (versionSet) return Optional.of(version);
-        else return Optional.empty();
+    /**
+     * Return a version associated with the index server. Return -1 if version not set.
+     *
+     * Call {@link IndexServer#isVersionSet()} to check if a version was set.
+     */
+    public int getVersion() {
+        return version;
+    }
+
+    public boolean isVersionSet() {
+        return versionSet;
     }
 }

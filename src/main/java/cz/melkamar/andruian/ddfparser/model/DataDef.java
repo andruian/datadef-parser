@@ -24,9 +24,7 @@
 
 package cz.melkamar.andruian.ddfparser.model;
 
-import javax.swing.text.html.Option;
 import java.util.Map;
-import java.util.Optional;
 
 public class DataDef {
     private final String uri;
@@ -62,25 +60,25 @@ public class DataDef {
         return sourceClassDef;
     }
 
-    public Optional<IndexServer> getIndexServer() {
-        return Optional.ofNullable(indexServer);
+    public IndexServer getIndexServer() {
+        return indexServer;
     }
 
     /**
      * Get a skos:prefLabel of this DataDef of the given language.
      * @param language A language string as used in RDF, e.g. for "something"@en the language string will be "en"
-     * @return A label in the given language or an empty Optional object if it does not exist.
+     * @return A label in the given language or null if it does not exist.
      */
-    public Optional<String> getLabel(String language) {
-        return Optional.ofNullable(labels.get(language));
+    public String getLabel(String language) {
+        return labels.get(language);
     }
 
     /**
      * Get a skos:prefLabel of this DataDef without any language specified.
-     * @return A label without a language tag or an empty Optional object if it does not exist.
+     * @return A label without a language tag or null if it does not exist.
      */
-    public Optional<String> getLabel() {
-        return Optional.ofNullable(labels.get(NO_LANG));
+    public String getLabel() {
+        return labels.get(NO_LANG);
     }
 
     @Override

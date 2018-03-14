@@ -59,7 +59,7 @@ public class DataDefParserTest {
         assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto",
                      dataDef.getLocationClassDef().getClassUri());
         assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
-        assertFalse(dataDef.getIndexServer().isPresent());
+        assertNull(dataDef.getIndexServer());
     }
 
     /**
@@ -111,34 +111,34 @@ public class DataDefParserTest {
                 case "http://datadefA":
                     assertFalse(tested[0]);
                     tested[0] = true;
-                    assertFalse(dataDef.getLabel().isPresent());
-                    assertFalse(dataDef.getLabel("en").isPresent());
-                    assertFalse(dataDef.getLabel("cs").isPresent());
+                    assertNull(dataDef.getLabel());
+                    assertNull(dataDef.getLabel("en"));
+                    assertNull(dataDef.getLabel("cs"));
                     break;
                 case "http://datadefB":
                     assertFalse(tested[1]);
                     tested[1] = true;
-                    assertTrue(dataDef.getLabel().isPresent());
-                    assertEquals("A testing label", dataDef.getLabel().get());
-                    assertFalse(dataDef.getLabel("en").isPresent());
-                    assertFalse(dataDef.getLabel("cs").isPresent());
+                    assertNotNull(dataDef.getLabel());
+                    assertEquals("A testing label", dataDef.getLabel());
+                    assertNull(dataDef.getLabel("en"));
+                    assertNull(dataDef.getLabel("cs"));
                     break;
                 case "http://datadefC":
                     assertFalse(tested[2]);
                     tested[2] = true;
-                    assertFalse(dataDef.getLabel().isPresent());
-                    assertTrue(dataDef.getLabel("en").isPresent());
-                    assertEquals("A testing label", dataDef.getLabel("en").get());
-                    assertFalse(dataDef.getLabel("cs").isPresent());
+                    assertNull(dataDef.getLabel());
+                    assertNotNull(dataDef.getLabel("en"));
+                    assertEquals("A testing label", dataDef.getLabel("en"));
+                    assertNull(dataDef.getLabel("cs"));
                     break;
                 case "http://datadefD":
                     assertFalse(tested[3]);
                     tested[3] = true;
-                    assertTrue(dataDef.getLabel().isPresent());
-                    assertEquals("A testing label", dataDef.getLabel().get());
-                    assertFalse(dataDef.getLabel("en").isPresent());
-                    assertTrue(dataDef.getLabel("cs").isPresent());
-                    assertEquals("Testovaci napis", dataDef.getLabel("cs").get());
+                    assertNotNull(dataDef.getLabel());
+                    assertEquals("A testing label", dataDef.getLabel());
+                    assertNull(dataDef.getLabel("en"));
+                    assertNotNull(dataDef.getLabel("cs"));
+                    assertEquals("Testovaci napis", dataDef.getLabel("cs"));
                     break;
             }
         }
@@ -164,8 +164,8 @@ public class DataDefParserTest {
         assertEquals("http://ruian.linked.opendata.cz/ontology/AdresniMisto",
                      dataDef.getLocationClassDef().getClassUri());
         assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
-        assertTrue(dataDef.getIndexServer().isPresent());
-        assertEquals("http://someUri", dataDef.getIndexServer().get().getUri());
+        assertNotNull(dataDef.getIndexServer());
+        assertEquals("http://someUri", dataDef.getIndexServer().getUri());
     }
 
     /**
@@ -180,11 +180,11 @@ public class DataDefParserTest {
 
         IndexServer indexServer = dataDefParser.parseIndexServer(vf.createIRI("http://indexserver"), model);
         assertEquals("http://someUri", indexServer.getUri());
-        assertEquals(new Integer(1), indexServer.getVersion().get());
+        assertEquals(1, indexServer.getVersion());
 
         indexServer = dataDefParser.parseIndexServer(vf.createIRI("http://indexserver-noversion"), model);
         assertEquals("http://someUri", indexServer.getUri());
-        assertFalse(indexServer.getVersion().isPresent());
+        assertFalse(indexServer.isVersionSet());
     }
 
     /**
