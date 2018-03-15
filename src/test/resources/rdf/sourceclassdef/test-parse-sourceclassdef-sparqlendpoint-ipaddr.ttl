@@ -7,7 +7,7 @@
 
 <http://sourceClassDef>
     a                        andr:SourceClassDef;
-    andr:sparqlEndpoint      "http://localhost:3030/test/query";
+    andr:sparqlEndpoint      "127.0.0.1:3030/test/query";
     andr:class               <http://AClass>;
     andr:pathToLocationClass ( <http://A> <http://B> <http://C> <http://D> );
     andr:selectProperty [ a andr:SelectPropertyDef;

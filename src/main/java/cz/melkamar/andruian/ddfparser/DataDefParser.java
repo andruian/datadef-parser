@@ -151,7 +151,7 @@ public class DataDefParser {
             throws DataDefFormatException {
         L.debug("Parsing a SourceClassDef {}", sourceClassDefResource.toString());
 
-        IRI sparqlEndpoint = getSingleObjectAsIri(sourceClassDefResource, URIs.ANDR.sparqlEndpoint, model);
+        Literal sparqlEndpoint = getSingleObjectAsLiteral(sourceClassDefResource, URIs.ANDR.sparqlEndpoint, model);
         L.debug("Found sparqlEndpoint " + sparqlEndpoint);
 
         IRI clazz = getSingleObjectAsIri(sourceClassDefResource, URIs.ANDR._class, model);
@@ -174,7 +174,7 @@ public class DataDefParser {
             selectProperties[i++] = parseSelectProperty(selectPropResource, model);
         }
 
-        return new SourceClassDef(sparqlEndpoint.toString(), clazz.toString(), pathToLocationClass, selectProperties);
+        return new SourceClassDef(sparqlEndpoint.getLabel(), clazz.toString(), pathToLocationClass, selectProperties);
     }
 
     /**
@@ -255,7 +255,7 @@ public class DataDefParser {
         }
 
         // Get ClassDef attributes
-        IRI sparqlEndpoint = getSingleObjectAsIri(locationClassDefResource, URIs.ANDR.sparqlEndpoint, model);
+        Literal sparqlEndpoint = getSingleObjectAsLiteral(locationClassDefResource, URIs.ANDR.sparqlEndpoint, model);
         L.debug("Found sparqlEndpoint " + sparqlEndpoint);
 
         IRI clazz = getSingleObjectAsIri(locationClassDefResource, URIs.ANDR._class, model);
@@ -293,7 +293,7 @@ public class DataDefParser {
             }
         }
 
-        return new LocationClassDef(sparqlEndpoint.toString(), clazz.toString(), classToLocPaths);
+        return new LocationClassDef(sparqlEndpoint.getLabel(), clazz.toString(), classToLocPaths);
     }
 
     /**
@@ -385,5 +385,21 @@ public class DataDefParser {
         Value val = getSingleObject(subject, propertyIri, model);
         if (val instanceof Resource) return (Resource) val;
         else throw new DataDefFormatException("Could not cast object " + val + " to a Resource.");
+    }
+
+    /**
+     * Read a {@link Resource} linked to the given subject via a property. Assert that one and only one such Resource exists.
+     *
+     * @param subject     A {@link Resource} from which to read.
+     * @param propertyIri A {@link IRI} of a property to read from the subject.
+     * @param model       A RDF4J model.
+     * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
+     * @throws DataDefFormatException If none or more than one such Resource exists or if the linked value cannot be cast to a Resource.
+     */
+    protected Literal getSingleObjectAsLiteral(Resource subject, IRI propertyIri, Model model)
+            throws DataDefFormatException {
+        Value val = getSingleObject(subject, propertyIri, model);
+        if (val instanceof Literal) return (Literal) val;
+        else throw new DataDefFormatException("Could not cast object " + val + " to a Literal.");
     }
 }

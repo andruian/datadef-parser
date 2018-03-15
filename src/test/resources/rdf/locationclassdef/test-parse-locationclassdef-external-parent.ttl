@@ -13,7 +13,7 @@
     andr:includeRdf     <http://example.org/some-rdf.ttl>;
 
     a                   andr:LocationDef;
-    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
+    andr:sparqlEndpoint "http://ruian.linked.opendata.cz/sparql";
     andr:class          ruian:AdresniMisto;
     andr:locationClassPathsSource :locClassPathsSource;
     andr:classToLocPath [a   andr:ClassToLocPath;

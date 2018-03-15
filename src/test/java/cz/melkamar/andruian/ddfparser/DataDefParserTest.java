@@ -262,6 +262,29 @@ public class DataDefParserTest {
     }
 
     /**
+     * Test {@link DataDefParser#parseSourceClassDef(Resource, Model)}.
+     */
+    @Test
+    public void parseSparqlEndpointIPAddr() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/sourceclassdef/test-parse-sourceclassdef-sparqlendpoint-ipaddr.ttl",
+                                                          this.getClass());
+        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
+
+        SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(vf.createIRI("http://sourceClassDef"), model);
+        assertEquals("127.0.0.1:3030/test/query", sourceClassDef.getSparqlEndpoint());
+        assertEquals("http://AClass", sourceClassDef.getClassUri());
+
+        assertArrayEquals(new String[]{"http://A", "http://B", "http://C", "http://D"},
+                          sourceClassDef.getPathToLocationClass().getPathElements());
+
+        assertEquals(1, sourceClassDef.getSelectProperties().length);
+        assertEquals("foobarblank", sourceClassDef.getSelectProperties()[0].getName());
+        assertArrayEquals(new String[]{"http://firstblank", "http://secondblank"},
+                          sourceClassDef.getSelectProperties()[0].getPath().getPathElements());
+    }
+
+    /**
      * Test {@link DataDefParser#parseClassToLocPath(Resource, Model)} .
      */
     @Test
