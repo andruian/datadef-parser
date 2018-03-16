@@ -60,3 +60,10 @@ Caused by: java.lang.ClassNotFoundException: Didn't find class "org.apache.xerce
 
 ## TODO
 - Link to the model class schema
+
+## Releasing a new version
+- Change the version in `build.gradle`
+- Set environment properties 
+    - `BINTRAY_USER` as Bintray username
+    - `BINTRAY_KEY` as the corresponding API key
+- Run `gradlew bintrayUpload`

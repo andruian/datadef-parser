@@ -1,11 +1,34 @@
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
 group 'cz.melkamar.andruian'
 version '1.0.2'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-
+apply plugin: 'java-library'
 
 sourceCompatibility = 1.8
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'releases'
+        name = 'ddfparser'
+        userOrg = 'andruian'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/andruian/datadef-parser'
+        version {
+            name = '1.0.2'
+            desc = 'Datadef Parser Library'
+            released  = new Date()
+            vcsTag = 'N/A'
+        }
+    }
+    publications = ['mavenJava']
+}
 
 publishing {
     publications {
@@ -26,5 +49,6 @@ dependencies {
     implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-turtle', version: '2.3-M1'
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation 'net.sf.supercsv:super-csv:2.4.0'
 
 }
