@@ -121,17 +121,17 @@ public class DataDefParser {
 
     public IndexServer parseIndexServer(Resource indexServerResource, Model model) throws DataDefFormatException {
         L.debug("Parsing an IndexServer " + indexServerResource.toString());
-        Resource indexServerUri = getSingleObjectAsResource(indexServerResource, URIs.ANDR.uri, model);
+        Literal indexServerUri = getSingleObjectAsLiteral(indexServerResource, URIs.ANDR.uri, model);
         Set<Literal> versionSet = Models.getPropertyLiterals(model, indexServerResource, URIs.ANDR.version);
         switch (versionSet.size()) {
             case 0:
-                return new IndexServer(indexServerUri.toString());
+                return new IndexServer(indexServerUri.getLabel());
             case 1:
                 Literal versionLiteral = versionSet.iterator().next();
                 try {
-                    return new IndexServer(indexServerUri.toString(), versionLiteral.intValue());
+                    return new IndexServer(indexServerUri.getLabel(), versionLiteral.intValue());
                 } catch (NumberFormatException e) {
-                    throw new DataDefFormatException("A version must be an integer, got " + versionLiteral.toString());
+                    throw new DataDefFormatException("A version must be an integer, got " + versionLiteral.getLabel());
                 }
             default:
                 throw new DataDefFormatException("Expected zero or one properties of type andr:uri. Found " + versionSet
