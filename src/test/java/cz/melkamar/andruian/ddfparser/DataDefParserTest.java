@@ -381,4 +381,49 @@ public class DataDefParserTest {
         assertArrayEquals(new String[]{"http://X"},
                           paths.get("http://classC").getLongCoord().getPathElements());
     }
+
+    /**
+     * Test {@link DataDefParser#parseLocationClassDef(Resource, Model)}. Include a part of the model in an external
+     * RDF file and check if including it works.
+     *
+     * Test the RDF uri being an IP address.
+     */
+    @Test
+    public void parseLocationClassDefExternalIpAddr() throws IOException, DataDefFormatException, RdfFormatException {
+        InputStream externalRdfIs = Util.readInputStreamFromResource(
+                "rdf/locationclassdef/external-ipaddr/test-parse-locationclassdef-external-child.ttl",
+                this.getClass());
+        Util.mockHttpClientResponse("http://127.0.0.1/some-rdf.ttl", Util.convertStreamToString(externalRdfIs));
+
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource(
+                "rdf/locationclassdef/external-ipaddr/test-parse-locationclassdef-external-parent.ttl",
+                this.getClass());
+        Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
+        LocationClassDef locationClassDef = dataDefParser.parseLocationClassDef(vf.createIRI("http://locationClassDef"),
+                                                                                model);
+
+        assertEquals("http://ruian.linked.opendata.cz/sparql", locationClassDef.getSparqlEndpoint());
+        assertEquals(URIs.Prefix.ruian + "AdresniMisto", locationClassDef.getClassUri());
+
+        Map<String, ClassToLocPath> paths = locationClassDef.getPathsToGps();
+        assertEquals(3, paths.size());
+
+        assertEquals("http://classA", paths.get("http://classA").getForClassUri());
+        assertArrayEquals(new String[]{"http://A"}, paths.get("http://classA").getLatCoord().getPathElements());
+        assertArrayEquals(new String[]{"http://X", "http://Y", "http://Z"},
+                          paths.get("http://classA").getLongCoord().getPathElements());
+
+        assertEquals("http://classB", paths.get("http://classB").getForClassUri());
+        assertArrayEquals(new String[]{"http://A", "http://B"},
+                          paths.get("http://classB").getLatCoord().getPathElements());
+        assertArrayEquals(new String[]{"http://X", "http://Y"},
+                          paths.get("http://classB").getLongCoord().getPathElements());
+
+        assertEquals("http://classC", paths.get("http://classC").getForClassUri());
+        assertArrayEquals(new String[]{"http://A"},
+                          paths.get("http://classC").getLatCoord().getPathElements());
+        assertArrayEquals(new String[]{"http://X"},
+                          paths.get("http://classC").getLongCoord().getPathElements());
+    }
 }

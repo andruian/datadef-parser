@@ -248,10 +248,10 @@ public class DataDefParser {
         L.debug("Parsing a LocationClassDef " + locationClassDefResource);
 
         // Include data from any RDFs linked
-        Set<IRI> includeRdfsSet = Models.getPropertyIRIs(model, locationClassDefResource, URIs.ANDR.includeRdf);
+        Set<Literal> includeRdfsSet = Models.getPropertyLiterals(model, locationClassDefResource, URIs.ANDR.includeRdf);
         L.debug("Found " + includeRdfsSet.size() + " rdf files to include.");
-        for (IRI rdfIri : includeRdfsSet) {
-            processIncludeRdf(rdfIri, model);
+        for (Literal rdfUrl : includeRdfsSet) {
+            processIncludeRdf(rdfUrl, model);
         }
 
         // Get ClassDef attributes
@@ -321,13 +321,13 @@ public class DataDefParser {
      * Process all andr:inludeRdf properties linked from the given resource.
      * Add data from the files to the current model.
      *
-     * @param rdfIri IRI to the RDF to be added to the model.
+     * @param fileUrl URL of the RDF file to be added to the model.
      * @param model  A model to expand with the data from a RDF file.
      */
-    protected void processIncludeRdf(IRI rdfIri, Model model) throws DataDefFormatException, RdfFormatException {
-        L.debug("Including data from RDF " + rdfIri);
+    protected void processIncludeRdf(Literal fileUrl, Model model) throws DataDefFormatException, RdfFormatException {
+        L.debug("Including data from RDF " + fileUrl);
         try {
-            InputStream is = Util.getHttp(rdfIri.toString());
+            InputStream is = Util.getHttp(fileUrl.getLabel());
             Model newModel = Rio.parse(is, "", RDFFormat.TURTLE);
             model.addAll(newModel);
         } catch (IOException e) {
