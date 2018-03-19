@@ -64,6 +64,8 @@ public class DataDef {
         return indexServer;
     }
 
+
+
     /**
      * Get a skos:prefLabel of this DataDef of the given language.
      * @param language A language string as used in RDF, e.g. for "something"@en the language string will be "en"
@@ -71,6 +73,10 @@ public class DataDef {
      */
     public String getLabel(String language) {
         return labels.get(language);
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
     }
 
     /**
