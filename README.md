@@ -27,7 +27,10 @@ The main class responsible for parsing is `DataDefParser`. Use it to convert a R
 POJOs that correnspond to the Andruian Data definition schema.
 
 [RDF4J](http://rdf4j.org/) is used as the RDF parser on the background. `DataDefParser` is capable of parsing any 
-RDF format that RDF4J can. Pass the format to the `DataDefParser#parse()` method.
+RDF format that RDF4J can. Pass the format to the `DataDefParser#parse()` method. **However**, the RDF4J parser 
+implementation must be present in the classpath of the library. By default, only Turtle is provided to keep the
+library size small. If you need anything else, it must be added to [build.gradle](build.gradle) and the library 
+rebuilt. 
 
 #### Example code:
 ```java
