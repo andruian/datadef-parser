@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'cz.melkamar.andruian'
-version '1.0.4'
+version '1.0.5'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -21,7 +21,7 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/andruian/datadef-parser'
         version {
-            name = '1.0.4'
+            name = '1.0.5'
             desc = 'Datadef Parser Library'
             released  = new Date()
             vcsTag = 'N/A'

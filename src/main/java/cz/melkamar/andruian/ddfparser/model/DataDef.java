@@ -33,7 +33,7 @@ public class DataDef {
     private final IndexServer indexServer;
     private final Map<String, String> labels;
 
-    public static final String NO_LANG = "__nolang__";
+    public static final String NO_LANG = "";
 
     public DataDef(String uri,
                    LocationClassDef locationClassDef,
