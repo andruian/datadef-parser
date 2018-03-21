@@ -62,6 +62,25 @@ public class DataDefParserTest {
     }
 
     /**
+     * Test {@link DataDefParser#parse(Model)}
+     */
+    @Test
+    public void parseDiacritics() throws IOException, DataDefFormatException, RdfFormatException {
+        DataDefParser dataDefParser = new DataDefParser();
+        InputStream is = Util.readInputStreamFromResource("rdf/test-parse-datadef-diacritics.ttl",
+                                                          this.getClass());
+        List<DataDef> l = dataDefParser.parse(is, RDFFormat.TURTLE);
+        assertEquals(1, l.size());
+        DataDef dataDef = l.get(0);
+
+        // For some reason having diacritics in the Java source file was not working, so replace the diacritics with dots
+        // and assume that if the parsing succeeds without errors, it is parsed correctly.
+        assertTrue(dataDef.getLocationClassDef().getClassUri().matches("http://ruian\\.linked\\.opendata\\.cz/ontology/Adresn.M.sto"));
+        assertEquals("http://AClass", dataDef.getSourceClassDef().getClassUri());
+        assertNull(dataDef.getIndexServer());
+    }
+
+    /**
      * Test {@link DataDefParser#parse(Model)} when there are multiple datadefs.
      */
     @Test
