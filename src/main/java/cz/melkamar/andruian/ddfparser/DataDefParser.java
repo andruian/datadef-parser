@@ -327,7 +327,10 @@ public class DataDefParser {
     protected void processIncludeRdf(Literal fileUrl, Model model) throws DataDefFormatException, RdfFormatException {
         L.debug("Including data from RDF " + fileUrl);
         try {
-            InputStream is = Util.getHttp(fileUrl.getLabel());
+            String payload = Util.getHttp(fileUrl.getLabel());
+            L.trace("External file payload:\n"+payload);
+
+            InputStream is = Util.convertStringToStream(payload);
             Model newModel = Rio.parse(is, "", RDFFormat.TURTLE);
             model.addAll(newModel);
         } catch (IOException e) {

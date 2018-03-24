@@ -25,10 +25,11 @@
 package cz.melkamar.andruian.ddfparser;
 
 import cz.melkamar.andruian.ddfparser.exception.InvalidMockParameterException;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 public class Util {
     public static InputStream readInputStreamFromResource(String resourcePath, Class clazz) throws IOException {
@@ -42,7 +43,7 @@ public class Util {
     /**
      * Perform a HTTP GET and just return the file contents.
      */
-    public static InputStream getHttp(String uri) throws IOException {
+    public static String getHttp(String uri) throws IOException {
         return Util.httpClient.getHttp(uri);
     }
 
@@ -50,8 +51,14 @@ public class Util {
      * A regular HTTP client which performs a connection and returns response as an InputStream.
      */
     static class HttpClient {
-        public InputStream getHttp(String uri) throws IOException {
-            return new URL(uri).openStream();
+        private static final OkHttpClient client = new OkHttpClient();
+
+        public String getHttp(String uri) throws IOException {
+            Request request = new Request.Builder().url(uri).build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response + " | "+response.body());
+                return response.body().string();
+            }
         }
     }
 
@@ -76,19 +83,23 @@ public class Util {
         }
 
         @Override
-        public InputStream getHttp(String uri) throws IOException {
+        public String getHttp(String uri) throws IOException {
             Util.httpClient = new HttpClient();
 
             if (!uri.equals(expectUri))
                 throw new InvalidMockParameterException("Expected " + expectUri + " got " + uri);
 
-            return new ByteArrayInputStream(mockResponse.getBytes(StandardCharsets.UTF_8));
+            return mockResponse;
         }
     }
 
     // from https://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
     static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        java.util.Scanner s = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
+    }
+
+    static InputStream convertStringToStream(String str) throws UnsupportedEncodingException {
+        return new ByteArrayInputStream(str.getBytes("UTF-8"));
     }
 }
