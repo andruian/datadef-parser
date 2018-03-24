@@ -44,6 +44,9 @@ import static org.junit.Assert.*;
 public class DataDefParserTest {
     SimpleValueFactory vf = SimpleValueFactory.getInstance();
 
+    /**
+     * Test whether RDF4J correctly parses <http://127.0.0.1:3030/bla> as IRI. Version 2.3.x fails to do so.
+     */
     @Test
     public void parseUrlTest() throws IOException {
         String txt = "<http://something.org> <http://prop.org> <http://127.0.0.1:3030/bla> .";
