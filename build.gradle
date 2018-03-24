@@ -2,8 +2,10 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
+def vernumber = '1.0.6'
+
 group 'cz.melkamar.andruian'
-version '1.0.5'
+version vernumber
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -21,7 +23,7 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/andruian/datadef-parser'
         version {
-            name = '1.0.5'
+            name = vernumber
             desc = 'Datadef Parser Library'
             released  = new Date()
             vcsTag = 'N/A'
