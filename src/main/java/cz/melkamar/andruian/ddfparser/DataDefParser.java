@@ -121,17 +121,17 @@ public class DataDefParser {
 
     public IndexServer parseIndexServer(Resource indexServerResource, Model model) throws DataDefFormatException {
         L.debug("Parsing an IndexServer " + indexServerResource.toString());
-        Literal indexServerUri = getSingleObjectAsLiteral(indexServerResource, URIs.ANDR.uri, model);
+        Resource indexServerUri = getSingleObjectAsResource(indexServerResource, URIs.ANDR.uri, model);
         Set<Literal> versionSet = Models.getPropertyLiterals(model, indexServerResource, URIs.ANDR.version);
         switch (versionSet.size()) {
             case 0:
-                return new IndexServer(indexServerUri.getLabel());
+                return new IndexServer(indexServerUri.toString());
             case 1:
                 Literal versionLiteral = versionSet.iterator().next();
                 try {
-                    return new IndexServer(indexServerUri.getLabel(), versionLiteral.intValue());
+                    return new IndexServer(indexServerUri.toString(), versionLiteral.intValue());
                 } catch (NumberFormatException e) {
-                    throw new DataDefFormatException("A version must be an integer, got " + versionLiteral.getLabel());
+                    throw new DataDefFormatException("A version must be an integer, got " + versionLiteral.toString());
                 }
             default:
                 throw new DataDefFormatException("Expected zero or one properties of type andr:uri. Found " + versionSet
@@ -151,7 +151,7 @@ public class DataDefParser {
             throws DataDefFormatException {
         L.debug("Parsing a SourceClassDef {}", sourceClassDefResource.toString());
 
-        Literal sparqlEndpoint = getSingleObjectAsLiteral(sourceClassDefResource, URIs.ANDR.sparqlEndpoint, model);
+        IRI sparqlEndpoint = getSingleObjectAsIri(sourceClassDefResource, URIs.ANDR.sparqlEndpoint, model);
         L.debug("Found sparqlEndpoint " + sparqlEndpoint);
 
         IRI clazz = getSingleObjectAsIri(sourceClassDefResource, URIs.ANDR._class, model);
@@ -174,7 +174,7 @@ public class DataDefParser {
             selectProperties[i++] = parseSelectProperty(selectPropResource, model);
         }
 
-        return new SourceClassDef(sparqlEndpoint.getLabel(), clazz.toString(), pathToLocationClass, selectProperties);
+        return new SourceClassDef(sparqlEndpoint.toString(), clazz.toString(), pathToLocationClass, selectProperties);
     }
 
     /**
@@ -248,14 +248,14 @@ public class DataDefParser {
         L.debug("Parsing a LocationClassDef " + locationClassDefResource);
 
         // Include data from any RDFs linked
-        Set<Literal> includeRdfsSet = Models.getPropertyLiterals(model, locationClassDefResource, URIs.ANDR.includeRdf);
+        Set<IRI> includeRdfsSet = Models.getPropertyIRIs(model, locationClassDefResource, URIs.ANDR.includeRdf);
         L.debug("Found " + includeRdfsSet.size() + " rdf files to include.");
-        for (Literal rdfUrl : includeRdfsSet) {
-            processIncludeRdf(rdfUrl, model);
+        for (IRI rdfIri : includeRdfsSet) {
+            processIncludeRdf(rdfIri, model);
         }
 
         // Get ClassDef attributes
-        Literal sparqlEndpoint = getSingleObjectAsLiteral(locationClassDefResource, URIs.ANDR.sparqlEndpoint, model);
+        IRI sparqlEndpoint = getSingleObjectAsIri(locationClassDefResource, URIs.ANDR.sparqlEndpoint, model);
         L.debug("Found sparqlEndpoint " + sparqlEndpoint);
 
         IRI clazz = getSingleObjectAsIri(locationClassDefResource, URIs.ANDR._class, model);
@@ -293,7 +293,7 @@ public class DataDefParser {
             }
         }
 
-        return new LocationClassDef(sparqlEndpoint.getLabel(), clazz.toString(), classToLocPaths);
+        return new LocationClassDef(sparqlEndpoint.toString(), clazz.toString(), classToLocPaths);
     }
 
     /**
@@ -321,13 +321,13 @@ public class DataDefParser {
      * Process all andr:inludeRdf properties linked from the given resource.
      * Add data from the files to the current model.
      *
-     * @param fileUrl URL of the RDF file to be added to the model.
+     * @param rdfIri IRI to the RDF to be added to the model.
      * @param model  A model to expand with the data from a RDF file.
      */
-    protected void processIncludeRdf(Literal fileUrl, Model model) throws DataDefFormatException, RdfFormatException {
-        L.debug("Including data from RDF " + fileUrl);
+    protected void processIncludeRdf(IRI rdfIri, Model model) throws DataDefFormatException, RdfFormatException {
+        L.debug("Including data from RDF " + rdfIri);
         try {
-            String payload = Util.getHttp(fileUrl.getLabel());
+            String payload = Util.getHttp(rdfIri.toString());
             L.trace("External file payload:\n"+payload);
 
             InputStream is = Util.convertStringToStream(payload);
@@ -388,21 +388,5 @@ public class DataDefParser {
         Value val = getSingleObject(subject, propertyIri, model);
         if (val instanceof Resource) return (Resource) val;
         else throw new DataDefFormatException("Could not cast object " + val + " to a Resource.");
-    }
-
-    /**
-     * Read a {@link Resource} linked to the given subject via a property. Assert that one and only one such Resource exists.
-     *
-     * @param subject     A {@link Resource} from which to read.
-     * @param propertyIri A {@link IRI} of a property to read from the subject.
-     * @param model       A RDF4J model.
-     * @return A single {@link Value} if only one exists. Otherwise an exception is thrown.
-     * @throws DataDefFormatException If none or more than one such Resource exists or if the linked value cannot be cast to a Resource.
-     */
-    protected Literal getSingleObjectAsLiteral(Resource subject, IRI propertyIri, Model model)
-            throws DataDefFormatException {
-        Value val = getSingleObject(subject, propertyIri, model);
-        if (val instanceof Literal) return (Literal) val;
-        else throw new DataDefFormatException("Could not cast object " + val + " to a Literal.");
     }
 }

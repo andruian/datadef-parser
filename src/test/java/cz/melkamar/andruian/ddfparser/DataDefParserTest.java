@@ -30,6 +30,7 @@ import cz.melkamar.andruian.ddfparser.model.*;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -42,6 +43,15 @@ import static org.junit.Assert.*;
 
 public class DataDefParserTest {
     SimpleValueFactory vf = SimpleValueFactory.getInstance();
+
+    @Test
+    public void parseUrlTest() throws IOException {
+        String txt = "<http://something.org> <http://prop.org> <http://127.0.0.1:3030/bla> .";
+        Model model = Rio.parse(Util.convertStringToStream(txt), "", RDFFormat.TURTLE);
+        for (Statement statement : model) {
+            System.out.println((IRI) statement.getObject());
+        }
+    }
 
     /**
      * Test {@link DataDefParser#parse(Model)}

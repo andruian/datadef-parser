@@ -7,7 +7,7 @@
 
 <http://locationClassDef>
     a                   andr:LocationDef;
-    andr:sparqlEndpoint "http://ruian.linked.opendata.cz/sparql";
+    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
     andr:class          ruian:AdresniMisto;
     andr:classToLocPath :adresniMistoClassToLocPath;
     andr:classToLocPath [a   andr:ClassToLocPath;

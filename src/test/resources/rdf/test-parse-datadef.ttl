@@ -16,7 +16,7 @@
 #
 <http://sourceClassDef>
     a                        andr:SourceClassDef;
-    andr:sparqlEndpoint      "http://localhost:3030/test/query";
+    andr:sparqlEndpoint      <http://localhost:3030/test/query>;
     andr:class               <http://AClass>;
     andr:pathToLocationClass ( <http://A> <http://B> <http://C> <http://D> );
     andr:selectProperty [ a andr:SelectPropertyDef;
@@ -31,7 +31,7 @@
 #
 <http://locationClassDef>
     a                   andr:LocationDef;
-    andr:sparqlEndpoint "http://ruian.linked.opendata.cz/sparql";
+    andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
     andr:class          ruian:AdresniMisto;
     andr:classToLocPath :adresniMistoClassToLocPath;
     andr:classToLocPath [a   andr:ClassToLocPath;

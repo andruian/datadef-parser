@@ -7,11 +7,11 @@
 
 <http://indexserver>
     a                 andr:IndexServer;
-    andr:uri  "http://someUri";
+    andr:uri  <http://someUri>;
     andr:version 1;
     .
 
 <http://indexserver-noversion>
     a                 andr:IndexServer;
-    andr:uri  "http://someUri";
+    andr:uri  <http://someUri>;
     .
