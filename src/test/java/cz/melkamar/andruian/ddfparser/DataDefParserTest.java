@@ -304,7 +304,7 @@ public class DataDefParserTest {
         Model model = dataDefParser.modelFromStream(is, RDFFormat.TURTLE);
 
         SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(vf.createIRI("http://sourceClassDef"), model);
-        assertEquals("127.0.0.1:3030/test/query", sourceClassDef.getSparqlEndpoint());
+        assertEquals("http://127.0.0.1:3030/test/query", sourceClassDef.getSparqlEndpoint());
         assertEquals("http://AClass", sourceClassDef.getClassUri());
 
         assertArrayEquals(new String[]{"http://A", "http://B", "http://C", "http://D"},

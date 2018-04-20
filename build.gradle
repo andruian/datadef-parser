@@ -2,7 +2,7 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
-def vernumber = '1.0.7'
+def vernumber = '1.0.8'
 
 group 'cz.melkamar.andruian'
 version vernumber
@@ -48,7 +48,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     // https://mvnrepository.com/artifact/org.eclipse.rdf4j/rdf4j-rio-turtle
-    implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-turtle', version: '2.2.4'
+    implementation group: 'org.eclipse.rdf4j', name: 'rdf4j-rio-turtle', version: '2.3.1'
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     implementation 'net.sf.supercsv:super-csv:2.4.0'
