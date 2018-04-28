@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/andruian/ddfparser.svg?branch=master)](https://travis-ci.org/andruian/ddfparser)
 
+[ddfparser on Bintray](https://bintray.com/andruian/releases/ddfparser)
+
 ## Installation
 #### Plain Java
 To use this library in a regular Java project, build a jar and include it on classpath: 
@@ -60,9 +62,6 @@ Caused by: javax.xml.datatype.DatatypeConfigurationException: Provider org.apach
 ...
 Caused by: java.lang.ClassNotFoundException: Didn't find class "org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl" on path: DexPathList ...
 ```
-
-## TODO
-- Link to the model class schema
 
 ## Releasing a new version
 - Change the version in `build.gradle`
