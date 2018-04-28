@@ -1,6 +1,6 @@
 # Andruian Data Definition parser
 
-[![Build Status](https://travis-ci.org/andruian/datadef-parser.svg?branch=master)](https://travis-ci.org/andruian/datadef-parser)
+[![Build Status](https://travis-ci.org/andruian/ddfparser.svg?branch=master)](https://travis-ci.org/andruian/ddfparser)
 
 ## Installation
 #### Plain Java
